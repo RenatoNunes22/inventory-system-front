@@ -1,6 +1,7 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { NavBar } from "./components/NavBar";
 import { Login } from "./pages/LoginPage/Login";
+import { Home } from "./pages/Home";
 
 export type appProps = {
   switchTheme: () => void;
@@ -18,6 +19,7 @@ export const AppRoutes = ({ switchTheme, modeTheme }: appProps) => {
         />
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/Home" element={<Home />} />
         </Routes>
       </Router>
     </>

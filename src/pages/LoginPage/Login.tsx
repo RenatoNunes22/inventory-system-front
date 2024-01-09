@@ -32,7 +32,7 @@ export const Login: React.FC = () => {
   const LoginFunction = (event: any) => {
     event.preventDefault();
     axios
-      .post(`${process.env.API_URI}/Login`, {
+      .post(`${import.meta.env.VITE_API_URI}/Login`, {
         email: username,
         password: password,
       })
