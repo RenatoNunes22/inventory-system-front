@@ -39,7 +39,11 @@ export const Login: React.FC = () => {
       .then((response) => {
         if (response.status === 200) {
           setToken(response.data.token);
-          navigate("/Home");
+          if (response.data.role === 1) {
+            navigate("/Inventory");
+          } else {
+            navigate("/Sold");
+          }
         } else {
           console.log("error");
         }
