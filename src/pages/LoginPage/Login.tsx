@@ -36,7 +36,7 @@ export const Login: React.FC = () => {
         email: username,
         password: password,
       })
-      .then((response) => {
+      .then((response: any) => {
         if (response.status === 200) {
           setToken(response.data.token);
           if (response.data.role === 1) {
