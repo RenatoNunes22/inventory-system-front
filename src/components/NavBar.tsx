@@ -49,13 +49,13 @@ export const NavBar = ({
         }}
       >
         <img src={modeTheme ? Logo : LogoWhite} width={"100px"} />
-        <div style={{ display: "flex", gap: "40px" }}>
+        {/* <div style={{ display: "flex", gap: "40px" }}>
           {modeTheme ? (
             <LightModeIcon onClick={switchTheme} sx={iconStyle} />
           ) : (
             <DarkModeIcon onClick={switchTheme} sx={iconStyle} />
           )}
-        </div>
+        </div> */}
         {children}
       </Grid>
     );
