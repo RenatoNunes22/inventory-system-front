@@ -12,10 +12,10 @@ import {
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import axios from 'axios'
-import { Device } from '../model/Device'
-import { formatarData } from '../utils/formatterData'
-import { Accessories } from '../model/Accessories'
-import Snackbars from '../components/SnackBar'
+import { Device } from '../../model/Device'
+import { formatarData } from '../../utils/formatterData'
+import { Accessories } from '../../model/Accessories'
+import Snackbars from '../../components/SnackBar'
 
 type DeleteProductProps = {
     productType: string

@@ -40,14 +40,13 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                 sx={{
                     backgroundColor: color,
                     margin: 0,
-                    padding: '0px 30px',
-                    height: '65px',
+                    padding: '10px 40px',
                     marginBottom: '50px',
                     boxShadow:
                         'rgba(0, 0, 0, 0.2) 0px 2px 4px -1px, rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px',
                 }}
             >
-                <img src={modeTheme ? Logo : LogoWhite} width={'100px'} />
+                <img src={modeTheme ? Logo : LogoWhite} width={'130px'} />
                 <div className="containerButtons" style={{ gap: '20px' }}>
                     <Button
                         onClick={() => {
@@ -77,7 +76,7 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                         sx={{ borderRadius: 0, color: '#FFF' }}
                         className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
                     >
-                        <div style={{ display: 'flex', alignItems: 'center' }}>Gerenciamento de usuarios</div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>Usuarios</div>
                     </Button>
 
                     <Button
@@ -88,7 +87,7 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                         sx={{ borderRadius: 0, color: '#FFF' }}
                         className={`button ${click === 'Area admnistrativa' ? 'clicado' : ''}`}
                     >
-                        <div style={{ display: 'flex', alignItems: 'center' }}>Area admnistrativa</div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>Área admnistrativa</div>
                     </Button>
                 </div>
                 {/* <div style={{ display: "flex", gap: "40px" }}>

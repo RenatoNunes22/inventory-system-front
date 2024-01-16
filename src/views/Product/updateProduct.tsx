@@ -6,20 +6,17 @@ import {
     Grid,
     InputLabel,
     MenuItem,
-    //Modal,
     Select,
     SelectChangeEvent,
     TextField,
-    //Typography,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import axios from 'axios'
-import { Device } from '../model/Device'
-import { formatarData } from '../utils/formatterData'
-import { convertDate } from '../utils/convertDate'
-//import logo from '../assets/logo.png'
-import { Accessories } from '../model/Accessories'
-import Snackbars from '../components/SnackBar'
+import { Device } from '../../model/Device'
+import { formatarData } from '../../utils/formatterData'
+import { convertDate } from '../../utils/convertDate'
+import { Accessories } from '../../model/Accessories'
+import Snackbars from '../../components/SnackBar'
 
 type UpdateProductProps = {
     productType: string
