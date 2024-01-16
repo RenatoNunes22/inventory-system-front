@@ -1,24 +1,30 @@
-.botao {
+.containerButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.button {
     position: relative;
     overflow: hidden;
   }
   
-  .botao::before {
+  .button::before {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     width: 0;
     height: 2px;
-    background-color:#03082e;
+    background-color:#FFF;
     transition: width 0.5s ease; /* Adiciona uma transição de largura de 0.5 segundos */
   }
   
-  .botao:hover::before {
+  .button:hover::before {
     width: 100%;
   }
   
-  .botao.clicado::before {
+  .button.clicado::before {
     width: 100%;
     transition: none; /* Remova a transição para tornar a borda estática após o clique */
   }

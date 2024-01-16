@@ -6,26 +6,22 @@ import {
     Grid,
     InputLabel,
     MenuItem,
-    //Modal,
     Select,
     SelectChangeEvent,
     TextField,
-    //Typography,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import axios from 'axios'
 import { Device } from '../model/Device'
 import { formatarData } from '../utils/formatterData'
-import { convertDate } from '../utils/convertDate'
-//import logo from '../assets/logo.png'
 import { Accessories } from '../model/Accessories'
 import Snackbars from '../components/SnackBar'
 
-type UpdateProductProps = {
+type DeleteProductProps = {
     productType: string
 }
 
-export default function UpdateProduct({ productType }: UpdateProductProps) {
+export default function DeleteProduct({ productType }: DeleteProductProps) {
     const [listDevice, setListDevice] = React.useState<Device[]>()
     const [listAccessories, setListAccessories] = React.useState<Accessories[]>()
     const [search, setSearch] = React.useState<number | string>('')
@@ -57,7 +53,41 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
         } else {
             axios
                 .get(`${import.meta.env.VITE_API_URI}/accessories/${search}`)
-                .then((res) => setDataAccessories(res.data[0]))
+                .then((res) =>
+                    productType === 'Device' ? setDataDevice(res.data[0]) : setDataAccessories(res.data[0])
+                )
+                .catch((err) => console.log(err))
+        }
+    }
+
+    const deleteProduct = () => {
+        if (productType === 'Device') {
+            axios
+                .delete(`${import.meta.env.VITE_API_URI}/devices/${search}`)
+                .then((res) => {
+                    setMessage(res.data)
+                    setOpen(true)
+                    setTimeout(() => {
+                        setDevice(undefined)
+                        setOpen(false)
+                        setNewNameProduct('')
+                        searchProduct()
+                    }, 2000)
+                })
+                .catch((err) => console.log(err))
+        } else {
+            axios
+                .delete(`${import.meta.env.VITE_API_URI}/accessories/${search}`)
+                .then((res) => {
+                    setMessage(res.data)
+                    setOpen(true)
+                    setTimeout(() => {
+                        setAccessories(undefined)
+                        setOpen(false)
+                        setNewNameProduct('')
+                        searchProduct()
+                    }, 2000)
+                })
                 .catch((err) => console.log(err))
         }
     }
@@ -85,72 +115,25 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
         setNewQuantityProduct(String(accessories.quantity))
     }
 
-    React.useEffect(() => {
-        if (productType === 'Device') {
-            axios.get(`${import.meta.env.VITE_API_URI}/devices/`).then((res) => {
-                setListDevice(res.data)
-            })
-        } else if (productType === 'Accessories') {
-            axios.get(`${import.meta.env.VITE_API_URI}/accessories/`).then((res) => {
-                setListAccessories(res.data)
-            })
-        }
-    }, [productType, open])
-
     const handleChange = (event: SelectChangeEvent) => {
         setSearch(event.target.value)
     }
 
-    const updateDevice = () => {
-        if (device) {
-            axios
-                .put(`${import.meta.env.VITE_API_URI}/devices/${device.seriesNumber}`, {
-                    name: newNameProduct ? newNameProduct : device.name,
-                    value: newValueProduct ? newValueProduct : device.value,
-                    type: newTypeProduct ? newTypeProduct : device.type,
-                    seriesNumber: newSeriesNumberProduct ? newSeriesNumberProduct : device.seriesNumber,
-                    status: newStatusProduct ? newStatusProduct : device.status,
-                    stateBattery: newStateBatteryProduct ? newStateBatteryProduct : device.stateBattery,
-                    maxDiscountAmout: newMaxDiscountAmoutProduct ? newMaxDiscountAmoutProduct : device.maxDiscountAmout,
-                    createdAt: newCreatedAtProduct ? convertDate(newCreatedAtProduct) : device.createdAt,
-                })
-                .then((res) => {
-                    setMessage(res.data)
-                    setOpen(true)
-                    setTimeout(() => {
-                        setDevice(undefined)
-                        setOpen(false)
-                    }, 2000)
-                })
-                .catch((err) => console.log(err))
+    React.useEffect(() => {
+        setDevice(undefined)
+        setAccessories(undefined)
+        if (productType === 'Device') {
+            axios.get(`${import.meta.env.VITE_API_URI}/devices/`).then((res) => {
+                setListDevice(res.data)
+                setNewNameProduct(res.data[0].name)
+            })
+        } else if (productType === 'Accessories') {
+            axios.get(`${import.meta.env.VITE_API_URI}/accessories/`).then((res) => {
+                setListAccessories(res.data)
+                setNewNameProduct(res.data[0].name)
+            })
         }
-    }
-
-    const updateAccessories = () => {
-        if (accessories) {
-            axios
-                .put(`${import.meta.env.VITE_API_URI}/accessories/${accessories?.name}`, {
-                    name: newNameProduct ? newNameProduct : accessories.name,
-                    value: newValueProduct ? newValueProduct : accessories.value,
-                    type: newTypeProduct ? newTypeProduct : accessories.type,
-                    quantity: newQuantityProduct ? newQuantityProduct : accessories.quantity,
-                    status: newStatusProduct ? newStatusProduct : accessories.status,
-                    maxDiscountAmout: newMaxDiscountAmoutProduct
-                        ? newMaxDiscountAmoutProduct
-                        : accessories.maxDiscountAmout,
-                    createdAt: newCreatedAtProduct ? convertDate(newCreatedAtProduct) : accessories.createdAt,
-                })
-                .then((res) => {
-                    setMessage(res.data)
-                    setOpen(true)
-                    setTimeout(() => {
-                        setAccessories(undefined)
-                        setOpen(false)
-                    }, 2000)
-                })
-                .catch((err) => console.log(err))
-        }
-    }
+    }, [productType])
 
     return (
         <Grid
@@ -235,6 +218,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                     >
                         <TextField
                             fullWidth
+                            disabled
                             id="outlined-basic"
                             label="Nome do produto"
                             variant="outlined"
@@ -245,6 +229,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                         />
                         <TextField
                             fullWidth
+                            disabled
                             id="outlined-basic"
                             label="Valor do produto"
                             variant="outlined"
@@ -255,6 +240,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                         />
                         <TextField
                             fullWidth
+                            disabled
                             id="outlined-basic"
                             label="Tipo do produto"
                             variant="outlined"
@@ -280,6 +266,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                             <>
                                 <TextField
                                     fullWidth
+                                    disabled
                                     id="outlined-basic"
                                     label="Numero de série"
                                     variant="outlined"
@@ -290,6 +277,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                                 />
                                 <TextField
                                     fullWidth
+                                    disabled
                                     id="outlined-basic"
                                     label="Estado da bateria"
                                     variant="outlined"
@@ -302,6 +290,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                         ) : (
                             <TextField
                                 fullWidth
+                                disabled
                                 id="outlined-basic"
                                 label="Quantidade de produto"
                                 variant="outlined"
@@ -314,6 +303,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
 
                         <TextField
                             fullWidth
+                            disabled
                             id="outlined-basic"
                             label="Desconto Máximo"
                             variant="outlined"
@@ -337,6 +327,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                     >
                         <TextField
                             fullWidth
+                            disabled
                             id="outlined-basic"
                             label="Status"
                             variant="outlined"
@@ -347,6 +338,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                         />
                         <TextField
                             fullWidth
+                            disabled
                             id="outlined-basic"
                             label="Data de criação"
                             variant="outlined"
@@ -358,20 +350,20 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                     </Grid>
                     <Snackbars
                         message={message}
-                        type={message !== 'Produto atualizado com sucesso!' ? 'error' : 'success'}
+                        type={message !== 'Produto deletado com sucesso!' ? 'error' : 'success'}
                         open={open}
                     />
                     <Grid item display={'flex'} justifyContent={'end'} width={'100%'}>
                         <Button
                             variant="contained"
-                            onClick={productType === 'Device' ? updateDevice : updateAccessories}
+                            onClick={deleteProduct}
                             sx={{
                                 width: '200px',
                                 backgroundColor: '#5e6464',
                                 color: '#FFFF',
                             }}
                         >
-                            Atualizar produto
+                            Excluir produto
                         </Button>
                     </Grid>
                 </Grid>

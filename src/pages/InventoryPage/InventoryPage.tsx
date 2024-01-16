@@ -19,6 +19,11 @@ import logo from '../../assets/Logo.png'
 import ViewStockDevice from '../../views/viewStockDevice'
 import ViewStockAccesories from '../../views/viewStockAccessories'
 import UpdateProduct from '../../views/updateProduct'
+import DeleteProduct from '../../views/deleteProduct'
+import DeleteIcon from '@mui/icons-material/Delete'
+import SyncAltIcon from '@mui/icons-material/SyncAlt'
+import TableViewIcon from '@mui/icons-material/TableView'
+import AddIcon from '@mui/icons-material/Add'
 
 export const Inventory: React.FC = () => {
     const [controlButton, setControlButton] = useState<'insert' | 'delete' | 'red' | 'update'>('insert')
@@ -124,7 +129,7 @@ export const Inventory: React.FC = () => {
             lg={12}
             xl={12}
         >
-            <Typography
+            {/* <Typography
                 sx={{
                     width: '100%',
                     fontSize: '22px',
@@ -134,7 +139,7 @@ export const Inventory: React.FC = () => {
                 }}
             >
                 Controle de estoque
-            </Typography>
+            </Typography> */}
             <Grid
                 container={true}
                 display={'flex'}
@@ -144,11 +149,12 @@ export const Inventory: React.FC = () => {
                 xs={12}
                 lg={12}
                 xl={12}
-                sx={{ padding: 5 }}
+                sx={{ padding: '0px 20px' }}
             >
                 <Grid
                     container
                     display={'flex'}
+                    alignItems={'center'}
                     flexDirection={'column'}
                     xs={12}
                     lg={3}
@@ -161,162 +167,213 @@ export const Inventory: React.FC = () => {
                         direction={'row'}
                         alignItems={'center'}
                         justifyContent={'start'}
-                        gap={1}
+                        gap={4}
                         sx={{ paddingBottom: '20px' }}
                     >
                         <Button
-                            onClick={() => setControlButton('insert')}
-                            variant="contained"
-                            sx={{ backgroundColor: '#03082e' }}
+                            onClick={() => {
+                                setControlButton('insert')
+                            }}
+                            sx={{ borderRadius: 0, color: '#03082e' }}
+                            className={`botao ${controlButton === 'insert' ? 'clicado' : ''}`}
                         >
-                            Inserir produto
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <AddIcon />
+                                Inserir produto
+                            </div>
                         </Button>
                         <Button
-                            onClick={() => setControlButton('red')}
-                            variant="contained"
-                            sx={{ backgroundColor: '#03082e' }}
+                            onClick={() => {
+                                setControlButton('red')
+                            }}
+                            sx={{ borderRadius: 0, color: '#03082e' }}
+                            className={`botao ${controlButton === 'red' ? 'clicado' : ''}`}
                         >
-                            Visualizar estoque
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <TableViewIcon />
+                                Visualizar estoque
+                            </div>
                         </Button>
                         <Button
-                            onClick={() => setControlButton('update')}
-                            variant="contained"
-                            sx={{ backgroundColor: '#03082e' }}
+                            onClick={() => {
+                                setControlButton('update')
+                            }}
+                            sx={{ borderRadius: 0, color: '#060c3b' }}
+                            className={`botao ${controlButton === 'update' ? 'clicado' : ''}`}
                         >
-                            Atualizar produto
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <SyncAltIcon />
+                                Atualizar produto
+                            </div>
                         </Button>
                         <Button
-                            onClick={() => setControlButton('delete')}
-                            variant="contained"
-                            sx={{ backgroundColor: '#03082e' }}
+                            onClick={() => {
+                                setControlButton('delete')
+                            }}
+                            sx={{ borderRadius: 0, color: '#03082e' }}
+                            className={`botao ${controlButton === 'delete' ? 'clicado' : ''}`}
                         >
-                            Excluir produto
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <DeleteIcon />
+                                Excluir produto
+                            </div>
                         </Button>
                     </Grid>
-                    <FormControl>
-                        <FormLabel color="primary" id="demo-row-radio-buttons-group-label">
-                            Selecione o tipo do produto
-                        </FormLabel>
-                        <RadioGroup
-                            row
-                            aria-labelledby="demo-row-radio-buttons-group-label"
-                            name="row-radio-buttons-group"
-                            value={productType}
-                            onChange={handleChange}
-                        >
-                            <FormControlLabel
-                                value="Device"
-                                control={<Radio defaultChecked={true} />}
-                                label="Aparelhos"
-                            />
-                            <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
-                        </RadioGroup>
-                    </FormControl>
-                    {controlButton === 'insert' && (
-                        <>
-                            <Grid item display={'flex'} gap={2}>
-                                <TextField
-                                    fullWidth
-                                    required
-                                    id="outlined-basic"
-                                    label={productType === 'Device' ? 'Nome do aparelho' : 'Nome do acessorio'}
-                                    variant="outlined"
-                                    value={nameDevice}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setNameDevice(event.target.value)
-                                    }}
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            flexDirection: 'column',
+                            gap: '20px',
+                            width: '90%',
+                            padding: '50px',
+                            marginTop: '10px',
+                            borderRadius: '10px',
+                            background: 'rgba(112, 133, 178, 0.05)',
+                            boxShadow: '5px 5px 30px 0px rgba(0, 0, 0, 0.30)',
+                        }}
+                    >
+                        <FormControl>
+                            <FormLabel color="primary" id="demo-row-radio-buttons-group-label">
+                                Selecione o tipo do produto
+                            </FormLabel>
+                            <RadioGroup
+                                row
+                                aria-labelledby="demo-row-radio-buttons-group-label"
+                                name="row-radio-buttons-group"
+                                value={productType}
+                                onChange={handleChange}
+                            >
+                                <FormControlLabel
+                                    value="Device"
+                                    control={<Radio defaultChecked={true} />}
+                                    label="Aparelhos"
                                 />
-                                <TextField
-                                    fullWidth
-                                    required
-                                    id="outlined-basic"
-                                    label="Valor do aparelho"
-                                    variant="outlined"
-                                    value={value}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setValue(event.target.value)
-                                    }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    required
-                                    id="outlined-basic"
-                                    label="Tipo do aparelho"
-                                    variant="outlined"
-                                    value={type}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setType(event.target.value)
-                                    }}
-                                />
-                            </Grid>
+                                <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
+                            </RadioGroup>
+                        </FormControl>
+                        {controlButton === 'insert' && (
+                            <>
+                                <Grid item display={'flex'} gap="20px" paddingTop={'20px'} style={{ width: '100%' }}>
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        id="outlined-basic"
+                                        label={productType === 'Device' ? 'Nome do aparelho' : 'Nome do acessorio'}
+                                        variant="outlined"
+                                        value={nameDevice}
+                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                            setNameDevice(event.target.value)
+                                        }}
+                                    />
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        id="outlined-basic"
+                                        label="Valor do aparelho"
+                                        variant="outlined"
+                                        value={value}
+                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                            setValue(event.target.value)
+                                        }}
+                                    />
+                                    <TextField
+                                        fullWidth
+                                        required
+                                        id="outlined-basic"
+                                        label="Tipo do aparelho"
+                                        variant="outlined"
+                                        value={type}
+                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                            setType(event.target.value)
+                                        }}
+                                    />
+                                </Grid>
 
-                            <Grid item display={'flex'} gap={2}>
-                                {productType === 'Device' ? (
-                                    <>
+                                <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
+                                    {productType === 'Device' ? (
+                                        <>
+                                            <TextField
+                                                required
+                                                fullWidth
+                                                id="outlined-basic"
+                                                label="Numero de série"
+                                                variant="outlined"
+                                                value={seriesNumber}
+                                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                                    setSeriesNumber(event.target.value)
+                                                }}
+                                            />
+                                            <TextField
+                                                required
+                                                fullWidth
+                                                id="outlined-basic"
+                                                label="Estado da bateria"
+                                                variant="outlined"
+                                                value={stateBattery}
+                                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                                    setStateBattery(event.target.value)
+                                                }}
+                                            />
+                                        </>
+                                    ) : (
                                         <TextField
                                             required
                                             fullWidth
                                             id="outlined-basic"
-                                            label="Numero de série"
+                                            label="Quantidade"
                                             variant="outlined"
-                                            value={seriesNumber}
+                                            value={quantity}
                                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                                setSeriesNumber(event.target.value)
+                                                setQuantity(event.target.value)
                                             }}
                                         />
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            id="outlined-basic"
-                                            label="Estado da bateria"
-                                            variant="outlined"
-                                            value={stateBattery}
-                                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                                setStateBattery(event.target.value)
-                                            }}
-                                        />
-                                    </>
-                                ) : (
+                                    )}
+
                                     <TextField
                                         required
                                         fullWidth
                                         id="outlined-basic"
-                                        label="Quantidade"
+                                        label="Desconto máximo"
                                         variant="outlined"
-                                        value={quantity}
+                                        value={maxDiscountAmout}
                                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                            setQuantity(event.target.value)
+                                            setMaxDiscountAmout(event.target.value)
                                         }}
                                     />
-                                )}
-
+                                </Grid>
                                 <TextField
-                                    required
                                     fullWidth
                                     id="outlined-basic"
-                                    label="Desconto máximo"
+                                    label="Status"
                                     variant="outlined"
-                                    value={maxDiscountAmout}
+                                    value={status}
                                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setMaxDiscountAmout(event.target.value)
+                                        setStatus(event.target.value)
                                     }}
                                 />
-                            </Grid>
-                            <TextField
-                                fullWidth
-                                id="outlined-basic"
-                                label="Status"
-                                variant="outlined"
-                                value={status}
-                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                    setStatus(event.target.value)
-                                }}
-                            />
-                        </>
-                    )}
-                    {controlButton === 'red' && productType === 'Device' && <ViewStockDevice />}
-                    {controlButton === 'red' && productType === 'Accessories' && <ViewStockAccesories />}
-                    {controlButton === 'update' && <UpdateProduct productType={productType} />}
+
+                                <Button
+                                    variant="contained"
+                                    sx={{
+                                        width: '250px',
+                                        backgroundColor: '#2b98c4',
+                                        color: '#FFFF',
+                                    }}
+                                    disabled={check ? false : true}
+                                    onClick={insertProduct}
+                                >
+                                    Inserir produto
+                                </Button>
+                            </>
+                        )}
+
+                        {controlButton === 'red' && productType === 'Device' && <ViewStockDevice />}
+                        {controlButton === 'red' && productType === 'Accessories' && <ViewStockAccesories />}
+                        {controlButton === 'update' && <UpdateProduct productType={productType} />}
+                        {controlButton === 'delete' && <DeleteProduct productType={productType} />}
+                    </div>
                 </Grid>
 
                 <Grid
@@ -352,20 +409,6 @@ export const Inventory: React.FC = () => {
                             </Grid>
                         </Box>
                     </Modal>
-                    {controlButton === 'insert' && (
-                        <Button
-                            variant="contained"
-                            sx={{
-                                width: '200px',
-                                backgroundColor: '#5e6464',
-                                color: '#FFFF',
-                            }}
-                            disabled={check ? false : true}
-                            onClick={insertProduct}
-                        >
-                            Inserir produto
-                        </Button>
-                    )}
                 </Grid>
             </Grid>
         </Grid>
