@@ -1,3 +1,14 @@
+.title{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #03082e;
+  font-weight: 500;
+  font-size: 18px;
+}
+
 .botao {
     position: relative;
     overflow: hidden;

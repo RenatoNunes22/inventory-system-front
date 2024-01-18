@@ -1,4 +1,4 @@
-import { Button, Grid, TextField } from '@mui/material'
+import { Button, FormControl, Grid, InputAdornment, InputLabel, OutlinedInput, TextField } from '@mui/material'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import Snackbars from '../../components/SnackBar'
@@ -95,7 +95,18 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         setNameDevice(event.target.value)
                     }}
                 />
-                <TextField
+                <FormControl fullWidth>
+                    <InputLabel htmlFor="outlined-adornment-amount">Valor do produto</InputLabel>
+                    <OutlinedInput
+                        id="outlined-adornment-amount"
+                        startAdornment={value !== '' ? <InputAdornment position="start">R$</InputAdornment> : null}
+                        label="Valor do produto"
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setValue(event.target.value)
+                        }}
+                    />
+                </FormControl>
+                {/* <TextField
                     fullWidth
                     required
                     id="outlined-basic"
@@ -105,7 +116,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setValue(event.target.value)
                     }}
-                />
+                /> */}
                 <TextField
                     fullWidth
                     required

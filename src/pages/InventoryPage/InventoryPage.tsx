@@ -50,7 +50,7 @@ export const Inventory: React.FC = () => {
                     alignItems={'center'}
                     flexDirection={'column'}
                     xs={12}
-                    lg={3}
+                    lg={12}
                     xl={12}
                     gap={2}
                     paddingBottom={2}

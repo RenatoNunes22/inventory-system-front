@@ -205,10 +205,15 @@ export default function ViewStockDevice() {
                                 <TableRow hover role="checkbox" tabIndex={-1} key={row.seriesNumber}>
                                     {columns.map((column) => {
                                         const value = row[column.id]
+                                        console.log(column.id)
                                         return (
                                             <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
                                                 {column.format && typeof value === 'number'
                                                     ? column.format(value)
+                                                    : column.id === 'value'
+                                                    ? `R$${value}`
+                                                    : column.id === 'stateBattery'
+                                                    ? `${value}%`
                                                     : value}
                                             </TableCell>
                                         )

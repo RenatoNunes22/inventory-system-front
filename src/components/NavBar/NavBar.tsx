@@ -71,7 +71,7 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                     <Button
                         onClick={() => {
                             setClick('Usuarios')
-                            navigate('/Users')
+                            navigate('/User')
                         }}
                         sx={{ borderRadius: 0, color: '#FFF' }}
                         className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
