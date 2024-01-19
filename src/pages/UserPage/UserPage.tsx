@@ -7,6 +7,9 @@ import TableViewIcon from '@mui/icons-material/TableView'
 import AddIcon from '@mui/icons-material/Add'
 import InsertUser from '../../views/User/insertUser'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
+import ViewStockUser from '../../views/User/viewStockUsers'
+import UpdateUser from '../../views/User/updateUser'
+import DeleteUser from '../../views/User/deleteUser'
 
 export const User: React.FC = () => {
     const [controlButton, setControlButton] = useState<'insert' | 'delete' | 'red' | 'update'>('insert')
@@ -122,6 +125,9 @@ export const User: React.FC = () => {
                         </div>
 
                         {controlButton === 'insert' && <InsertUser />}
+                        {controlButton === 'red' && <ViewStockUser />}
+                        {controlButton === 'update' && <UpdateUser />}
+                        {controlButton === 'delete' && <DeleteUser />}
                     </div>
                 </Grid>
             </Grid>

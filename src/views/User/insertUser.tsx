@@ -45,7 +45,7 @@ export default function InsertUser() {
             axios
                 .post(`${import.meta.env.VITE_API_URI}/users`, {
                     email: email,
-                    cpfl: cpf,
+                    cpf: cpf,
                     name: name,
                     dn: dn,
                     role: role,
@@ -57,6 +57,7 @@ export default function InsertUser() {
                     setOpen(true)
                     setTimeout(() => {
                         setOpen(false)
+                        window.location.reload()
                     }, 2000)
                 })
         }
