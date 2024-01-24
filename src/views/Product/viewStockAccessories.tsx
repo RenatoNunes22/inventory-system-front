@@ -131,7 +131,7 @@ export default function ViewStockAccesories() {
         fetchData()
     }, [])
 
-    const handleChangePage = (event: unknown, newPage: number) => {
+    const handleChangePage = (newPage: number) => {
         setPage(newPage)
     }
 
@@ -188,7 +188,7 @@ export default function ViewStockAccesories() {
                 count={rows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                onPageChange={handleChangePage}
+                onPageChange={() => handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
         </Paper>

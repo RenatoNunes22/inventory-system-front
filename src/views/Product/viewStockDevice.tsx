@@ -140,7 +140,7 @@ export default function ViewStockDevice() {
         },
     ])
 
-    const handleChangePage = (event: unknown, newPage: number) => {
+    const handleChangePage = (newPage: number) => {
         setPage(newPage)
     }
 
@@ -230,7 +230,7 @@ export default function ViewStockDevice() {
                 count={rows.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                onPageChange={handleChangePage}
+                onPageChange={() => handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
             />
         </Paper>
