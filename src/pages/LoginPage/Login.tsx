@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react'
-import Logo from '../../assets/logo.png'
+import Logo from '../../assets/Logo.png'
 import LogoMobile from '../../assets/LogoWhite.png'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import VisibilityIcon from '@mui/icons-material/Visibility'
