@@ -13,7 +13,7 @@ export const AppRoutes = ({ switchTheme, modeTheme }: appProps) => {
     return (
         <>
             <Router>
-                <NavBar modeTheme={modeTheme} switchTheme={switchTheme} color={modeTheme ? '#FFFF' : '#03092e'} />
+                <NavBar modeTheme={modeTheme} switchTheme={switchTheme} color={modeTheme ? '#FFFF' : 'transparent'} />
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="/Inventory" element={<Inventory />} />

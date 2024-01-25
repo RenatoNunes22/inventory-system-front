@@ -59,7 +59,7 @@ export const User: React.FC = () => {
                             onClick={() => {
                                 setControlButton('insert')
                             }}
-                            sx={{ borderRadius: 0, color: '#03082e' }}
+                            sx={{ borderRadius: 0, color: '#FFFF' }}
                             className={`botao ${controlButton === 'insert' ? 'clicado' : ''}`}
                         >
                             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -71,7 +71,7 @@ export const User: React.FC = () => {
                             onClick={() => {
                                 setControlButton('red')
                             }}
-                            sx={{ borderRadius: 0, color: '#03082e' }}
+                            sx={{ borderRadius: 0, color: '#FFFF' }}
                             className={`botao ${controlButton === 'red' ? 'clicado' : ''}`}
                         >
                             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -83,7 +83,7 @@ export const User: React.FC = () => {
                             onClick={() => {
                                 setControlButton('update')
                             }}
-                            sx={{ borderRadius: 0, color: '#060c3b' }}
+                            sx={{ borderRadius: 0, color: '#FFFF' }}
                             className={`botao ${controlButton === 'update' ? 'clicado' : ''}`}
                         >
                             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -95,7 +95,7 @@ export const User: React.FC = () => {
                             onClick={() => {
                                 setControlButton('delete')
                             }}
-                            sx={{ borderRadius: 0, color: '#03082e' }}
+                            sx={{ borderRadius: 0, color: '#FFFF' }}
                             className={`botao ${controlButton === 'delete' ? 'clicado' : ''}`}
                         >
                             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -110,24 +110,38 @@ export const User: React.FC = () => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             flexDirection: 'column',
-                            gap: '20px',
                             width: '90%',
-                            padding: '50px',
+                            padding: '15px',
                             marginTop: '10px',
-                            borderRadius: '10px',
-                            background: 'rgba(112, 133, 178, 0.05)',
-                            boxShadow: '5px 5px 30px 0px rgba(0, 0, 0, 0.30)',
+                            borderRadius: '16px',
+                            background: 'rgba(248, 249, 251, 0.15)',
+                            boxShadow: '0px 0px 35px 0px rgba(0, 0, 0, 0.25)',
                         }}
                     >
-                        <div className="title">
-                            <PeopleAltIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
-                            Gerenciamento de Usuários
-                        </div>
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                flexDirection: 'column',
+                                gap: '20px',
+                                width: '100%',
+                                padding: '50px',
+                                borderRadius: '10px',
+                                background: '#FFFF',
+                                boxShadow: '5px 5px 30px 0px rgba(0, 0, 0, 0.30)',
+                            }}
+                        >
+                            <div className="title">
+                                <PeopleAltIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
+                                Gerenciamento de Usuários
+                            </div>
 
-                        {controlButton === 'insert' && <InsertUser />}
-                        {controlButton === 'red' && <ViewStockUser />}
-                        {controlButton === 'update' && <UpdateUser />}
-                        {controlButton === 'delete' && <DeleteUser />}
+                            {controlButton === 'insert' && <InsertUser />}
+                            {controlButton === 'red' && <ViewStockUser />}
+                            {controlButton === 'update' && <UpdateUser />}
+                            {controlButton === 'delete' && <DeleteUser />}
+                        </div>
                     </div>
                 </Grid>
             </Grid>
