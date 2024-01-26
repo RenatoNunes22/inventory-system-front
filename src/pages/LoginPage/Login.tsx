@@ -17,6 +17,7 @@ export const Login: React.FC = () => {
     const isMobile = useMedia('(max-width: 1050px)')
 
     const [, setToken] = useLocalStorage('token', '')
+    const [, setUser] = useLocalStorage('user', '')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -32,12 +33,13 @@ export const Login: React.FC = () => {
     const LoginFunction = (event: any) => {
         event.preventDefault()
         axios
-            .post(`${import.meta.env.VITE_API_URI}/Login`, {
+            .post(`${import.meta.env.VITE_API_URI}/login`, {
                 email: username,
                 password: password,
             })
             .then((response: any) => {
                 if (response.status === 200) {
+                    setUser(response.data.cpf)
                     setToken(response.data.token)
                     if (response.data.role === 1) {
                         navigate('/Inventory')

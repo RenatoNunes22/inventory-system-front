@@ -3,6 +3,7 @@ import { NavBar } from './components/NavBar/NavBar'
 import { Login } from './pages/LoginPage/Login'
 import { Inventory } from './pages/InventoryPage/InventoryPage'
 import { User } from './pages/UserPage/UserPage'
+import { Sold } from './pages/SoldPage/SoldPage'
 
 export type appProps = {
     switchTheme: () => void
@@ -18,6 +19,7 @@ export const AppRoutes = ({ switchTheme, modeTheme }: appProps) => {
                     <Route path="/" element={<Login />} />
                     <Route path="/Inventory" element={<Inventory />} />
                     <Route path="/User" element={<User />} />
+                    <Route path="/Sold" element={<Sold />} />
                 </Routes>
             </Router>
         </>
