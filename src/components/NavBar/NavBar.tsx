@@ -53,7 +53,7 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                     backgroundColor: color,
                     margin: 0,
                     padding: '30px 50px',
-                    marginBottom: '100px',
+                    marginBottom: '5%',
                 }}
             >
                 <img src={modeTheme ? Logo : LogoWhite} width={'130px'} />

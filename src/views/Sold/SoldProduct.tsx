@@ -24,16 +24,16 @@ type InsertProductProps = {
 }
 
 export default function SoldProduct({ productType }: InsertProductProps) {
-    const user = localStorage.getItem('user')
+    const user = localStorage.getItem('user')?.replace(/"/g, '')
     const [listDevice, setListDevice] = useState<Device[]>()
     const [listAccessories, setListAccessories] = useState<Accessories[]>()
-    const [listClient, setListClients] = useState<Client[]>()
     const [search, setSearch] = useState<number | string>('')
     const [seletedDevice, setSeletedDevice] = useState<Device>()
     const [seletedAccessories, setSeletedAccessories] = useState<Accessories>()
     const [seletedClient, setSeletedClient] = useState<Client>()
 
-    const [client, setClient] = useState<string>()
+    //CLIENT
+    const [selectedClient, setSelectedClient] = useState<Client>()
     const [nameClient, setNameClient] = useState('')
     const [email, setEmail] = useState<string>('')
     const [fees, setFees] = useState<string>('')
@@ -41,6 +41,16 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const [dn, setDn] = useState<string>('')
     const [phone, setPhone] = useState<string>('')
     const [quantity, setQuantity] = useState<string>('')
+
+    //ADDRESS
+    const [cep, setCep] = useState<string>('')
+    const [state, setState] = useState<string>('')
+    const [city, setCity] = useState<string>('')
+    const [neighborhood, setNeighborhood] = useState<string>('')
+    const [street, setStreet] = useState<string>('')
+    const [number, setNumber] = useState<string>('')
+    const [complement, setComplement] = useState<string>('')
+
     const [message, setMessage] = useState<string>('')
     const [open, setOpen] = useState(false)
 
@@ -50,18 +60,62 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const formPayment = ['Dinheiro', 'Cartão de crédito', 'Cartão de débito', 'Pix', 'Boleto']
 
     useEffect(() => {
+        if (cep.length === 8 && !selectedClient) {
+            axios.get(`https://viacep.com.br/ws/${cep}/json/`).then((res) => {
+                setState(res.data.uf)
+                setCity(res.data.localidade)
+                setNeighborhood(res.data.bairro)
+                setStreet(res.data.logradouro)
+            })
+        } else if (!selectedClient) {
+            setState('')
+            setCity('')
+            setNeighborhood('')
+            setStreet('')
+        }
+    }, [cep])
+
+    useEffect(() => {
+        if (!isNaN(Number(cpf)) && cpf.length === 11) {
+            axios.get(`${import.meta.env.VITE_API_URI}/clients/${cpf}`).then((res) => {
+                setSelectedClient(res.data[0])
+                setNameClient(res.data[0].name)
+                setEmail(res.data[0].email)
+                setDn(res.data[0].dn)
+                setPhone(res.data[0].telephone)
+                setCep(res.data[0].cep)
+                setState(res.data[0].state)
+                setCity(res.data[0].city)
+                setNeighborhood(res.data[0].neighborhood)
+                setStreet(res.data[0].street)
+                setNumber(res.data[0].number)
+            })
+        } else {
+            setNameClient('')
+            setEmail('')
+            setDn('')
+            setPhone('')
+            setCep('')
+            setState('')
+            setCity('')
+            setNeighborhood('')
+            setStreet('')
+            setNumber('')
+        }
+    }, [cpf])
+
+    useEffect(() => {
         Promise.all([
             axios.get(`${import.meta.env.VITE_API_URI}/devices/`),
             axios.get(`${import.meta.env.VITE_API_URI}/accessories/`),
-            axios.get(`${import.meta.env.VITE_API_URI}/clients/`),
         ]).then((res) => {
             setListDevice(res[0].data)
             setListAccessories(res[1].data)
-            setListClients(res[2].data)
         })
     }, [productType, open])
 
     const handleChange = (event: SelectChangeEvent) => {
+        console.log(event.target.value)
         setSearch(event.target.value)
     }
 
@@ -69,27 +123,19 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         setSelectedPayment(event.target.value)
     }
 
-    const handleChangeClient = (event: SelectChangeEvent) => {
-        setClient(event.target.value)
-    }
-
     useEffect(() => {
-        if (productType === 'Device') {
-            axios.get(`${import.meta.env.VITE_API_URI}/devices/${search}`).then((res) => {
-                setSeletedDevice(res.data[0])
-            })
-        } else if (productType === 'Accessories') {
-            axios.get(`${import.meta.env.VITE_API_URI}/accessories/${search}`).then((res) => {
-                setSeletedAccessories(res.data[0])
-            })
+        if (search) {
+            if (productType === 'Device') {
+                axios.get(`${import.meta.env.VITE_API_URI}/devices/${search}`).then((res) => {
+                    setSeletedDevice(res.data[0])
+                })
+            } else if (productType === 'Accessories') {
+                axios.get(`${import.meta.env.VITE_API_URI}/accessories/${search}`).then((res) => {
+                    setSeletedAccessories(res.data[0])
+                })
+            }
         }
     }, [search])
-
-    useEffect(() => {
-        axios.get(`${import.meta.env.VITE_API_URI}/clients/${client}`).then((res) => {
-            setSeletedClient(res.data[0])
-        })
-    }, [client])
 
     useEffect(() => {
         setSeletedDevice(undefined)
@@ -98,23 +144,65 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [productType])
 
     useEffect(() => {
-        if (seletedDevice || (seletedAccessories && nameClient && value && email && cpf)) {
+        if (
+            (seletedDevice || seletedAccessories) &&
+            nameClient &&
+            value &&
+            email &&
+            cpf &&
+            cep &&
+            state &&
+            city &&
+            neighborhood &&
+            street &&
+            number
+        ) {
             setCheck(true)
         } else {
             setCheck(false)
         }
-    }, [seletedDevice, seletedAccessories, nameClient, value, email, cpf])
+    }, [
+        seletedDevice,
+        seletedAccessories,
+        nameClient,
+        value,
+        email,
+        cpf,
+        cep,
+        state,
+        city,
+        neighborhood,
+        street,
+        number,
+    ])
 
     const soldProduct = () => {
+        if (selectedClient === undefined) {
+            axios.post(`${import.meta.env.VITE_API_URI}/clients`, {
+                email: email,
+                cpf: cpf,
+                name: nameClient,
+                dn: dn,
+                telephone: phone,
+                cep: cep,
+                state: state,
+                city: city,
+                neighborhood: neighborhood,
+                street: street,
+                number: number,
+                complement: complement,
+                products: [],
+            })
+        }
         if (productType === 'Device') {
             axios
-                .put(`${import.meta.env.VITE_API_URI}/deviceSold/${search}`, {
-                    soldValue: value,
+                .post(`${import.meta.env.VITE_API_URI}/deviceSold/${search}`, {
+                    soldValue: Number(value),
                     seriesNumber: seletedDevice?.seriesNumber,
                     expense: 0,
-                    fees: Number(fees),
+                    fees: fees && !isNaN(Number(fees)) ? Number(fees) : 0,
                     formPayment: selectedPayment,
-                    client: seletedClient?.cpf,
+                    client: cpf,
                     seller: user,
                 })
                 .then((res) => {
@@ -150,15 +238,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
 
     return (
         <>
-            <Grid
-                item
-                display={'flex'}
-                flexDirection={'row'}
-                alignItems={'start'}
-                gap="20px"
-                paddingTop={'10px'}
-                style={{ width: '100%' }}
-            >
+            <Grid item display={'flex'} flexDirection={'row'} alignItems={'start'} gap="20px" style={{ width: '100%' }}>
                 <Box sx={{ minWidth: '200px', width: '100%' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Selecione o produto</InputLabel>
@@ -225,7 +305,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                                 id="demo-simple-select"
                                 value={''}
                                 label="Selecione um brinde"
-                                onChange={handleChange}
+                                //onChange={handleChange}
                             >
                                 {listAccessories?.map((accessories: Accessories) => (
                                     <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
@@ -266,22 +346,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 </div>
             </Grid>
             <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
-                <Box sx={{ minWidth: '200px', width: '100%' }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Selecione o cliente</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={client ? client : ''}
-                            label="Selecione o cliente"
-                            onChange={handleChangeClient}
-                        >
-                            {listClient?.map((item) => (
-                                <MenuItem value={item.cpf}>{item.cpf}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
                 <TextField
                     required
                     fullWidth
@@ -305,8 +369,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         setEmail(event.target.value)
                     }}
                 />
-            </Grid>
-            <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
                 <TextField
                     fullWidth
                     id="outlined-basic"
@@ -317,6 +379,8 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         setNameClient(event.target.value)
                     }}
                 />
+            </Grid>
+            <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
                 <TextField
                     fullWidth
                     id="outlined-basic"
@@ -337,10 +401,91 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         setPhone(event.target.value)
                     }}
                 />
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="CEP"
+                    variant="outlined"
+                    value={cep}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setCep(event.target.value)
+                    }}
+                />
+            </Grid>
+            <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Estado"
+                    variant="outlined"
+                    value={state}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setState(event.target.value)
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Cidade"
+                    variant="outlined"
+                    value={city}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setCity(event.target.value)
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Bairro"
+                    variant="outlined"
+                    value={neighborhood}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setNeighborhood(event.target.value)
+                    }}
+                />
+            </Grid>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={'row'}
+                justifyContent={'start'}
+                gap={'20px'}
+                style={{ width: '100%' }}
+            >
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Logradouro"
+                    variant="outlined"
+                    value={street}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setStreet(event.target.value)
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Número"
+                    variant="outlined"
+                    value={number}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setNumber(event.target.value)
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Complemento"
+                    variant="outlined"
+                    value={complement}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setComplement(event.target.value)
+                    }}
+                />
             </Grid>
             <Snackbars
                 message={message}
-                type={message !== 'Produto inserido com sucesso!' ? 'error' : 'success'}
+                type={message !== 'Aparelho vendido com sucesso!' ? 'error' : 'success'}
                 open={open}
             />
             <Grid
@@ -350,21 +495,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 gap={'20px'}
                 style={{ width: '100%', marginTop: '20px' }}
             >
-                <Button
-                    variant="contained"
-                    sx={{
-                        width: '200px',
-                        backgroundColor: '#2b98c4',
-                        color: '#FFFF',
-                    }}
-                    disabled={seletedClient ? false : true}
-                    onClick={() => {
-                        setSeletedClient(undefined)
-                        setClient(undefined)
-                    }}
-                >
-                    Limpar cliente
-                </Button>
                 <Button
                     variant="contained"
                     sx={{

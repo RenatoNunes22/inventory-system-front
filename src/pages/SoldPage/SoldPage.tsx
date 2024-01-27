@@ -4,6 +4,7 @@ import TableViewIcon from '@mui/icons-material/TableView'
 import { useState } from 'react'
 import './style.css'
 import SoldProduct from '../../views/Sold/SoldProduct'
+import ViewStockSoldDevice from '../../views/Sold/viewStockSoldDevice'
 
 export const Sold: React.FC = () => {
     const [controlButton, setControlButton] = useState<'sold' | 'history'>('sold')
@@ -152,6 +153,7 @@ export const Sold: React.FC = () => {
                             )}
 
                             {controlButton === 'sold' && <SoldProduct productType={productType} />}
+                            {controlButton === 'history' && <ViewStockSoldDevice />}
                         </div>
                     </div>
                 </Grid>
