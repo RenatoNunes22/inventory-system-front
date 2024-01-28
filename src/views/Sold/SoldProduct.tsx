@@ -83,9 +83,9 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [cep])
 
     useEffect(() => {
-        const newCPF = cpf.replace(caracteresARemover, '')
-        if (newCPF.length === 11) {
-            axios.get(`${import.meta.env.VITE_API_URI}/clients/${newCPF}`).then((res) => {
+        //const newCPF = cpf.replace(caracteresARemover, '')
+        if (cpf.length === 14) {
+            axios.get(`${import.meta.env.VITE_API_URI}/clients/${cpf}`).then((res) => {
                 setSelectedClient(res.data[0])
                 setNameClient(res.data[0].name)
                 setEmail(res.data[0].email)
