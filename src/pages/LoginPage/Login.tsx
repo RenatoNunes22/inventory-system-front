@@ -6,6 +6,8 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import imgBackground from '../../assets/Product.png'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import ErrorIcon from '@mui/icons-material/Error'
 import './style.css'
 import { useMedia } from '../../hooks/mediaQueryHook'
 import axios from 'axios'
@@ -15,7 +17,7 @@ import { useLocalStorage } from '../../hooks/localStorageHook'
 export const Login: React.FC = () => {
     const navigate = useNavigate()
     const isMobile = useMedia('(max-width: 1050px)')
-
+    const [success, setSuccess] = useState<string>('')
     const [, setToken] = useLocalStorage('token', '')
     const [, setUser] = useLocalStorage('user', '')
     const [, setRole] = useLocalStorage('role', '')
@@ -43,16 +45,26 @@ export const Login: React.FC = () => {
                     setUser(response.data.cpf)
                     setToken(response.data.token)
                     setRole(response.data.role)
+                    setSuccess('Login efetuado com sucesso')
                     if (response.data.role === 1) {
                         navigate('/Inventory')
                     } else {
                         navigate('/Sold')
                     }
                 } else {
-                    console.log('error')
+                    setSuccess('Usuário ou senha incorretos')
                 }
             })
+            .catch(() => {
+                setSuccess('Usuário ou senha incorretos')
+            })
     }
+
+    useEffect(() => {
+        setTimeout(() => {
+            setSuccess('')
+        }, 2000)
+    }, [success])
 
     return (
         <div className={isMobile ? 'containerLoginMobile' : 'containerLogin'}>
@@ -100,6 +112,15 @@ export const Login: React.FC = () => {
                 >
                     Entrar
                 </button>
+                {success !== '' && (
+                    <span
+                        className={success === 'Usuário ou senha incorretos' ? 'successRed' : 'successGreen'}
+                        style={{ width: isMobile ? '300px' : '350px' }}
+                    >
+                        {success === 'Usuário ou senha incorretos' ? <ErrorIcon /> : <CheckCircleOutlineIcon />}
+                        {success}
+                    </span>
+                )}
             </form>
             {!isMobile && (
                 <div className="imgBackground">

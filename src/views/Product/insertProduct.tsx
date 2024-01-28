@@ -2,12 +2,14 @@ import { Button, FormControl, Grid, InputAdornment, InputLabel, OutlinedInput, T
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import Snackbars from '../../components/SnackBar'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 type InsertProductProps = {
     productType: string
 }
 
 export default function InsertProduct({ productType }: InsertProductProps) {
+    const isMobile = useMedia('(max-width: 850px)')
     const [quantity, setQuantity] = useState<string>('')
     const [message, setMessage] = useState<string>('')
     const [open, setOpen] = useState(false)
@@ -83,7 +85,14 @@ export default function InsertProduct({ productType }: InsertProductProps) {
 
     return (
         <>
-            <Grid item display={'flex'} gap="20px" paddingTop={'20px'} style={{ width: '100%' }}>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={isMobile ? 'column' : 'row'}
+                gap="20px"
+                paddingTop={'20px'}
+                style={{ width: '100%' }}
+            >
                 <TextField
                     fullWidth
                     required
@@ -130,7 +139,13 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                 />
             </Grid>
 
-            <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={isMobile ? 'column' : 'row'}
+                gap={'20px'}
+                style={{ width: '100%' }}
+            >
                 {productType === 'Device' ? (
                     <>
                         <TextField
@@ -200,7 +215,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
             <Button
                 variant="contained"
                 sx={{
-                    width: '250px',
+                    width: isMobile ? '100%' : '200px',
                     backgroundColor: '#2b98c4',
                     color: '#FFFF',
                 }}

@@ -5,6 +5,8 @@
   align-items: center;
   height: 100%;
   background-color: #000000;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .containerLoginMobile {
@@ -13,7 +15,9 @@
   justify-content: center;
   align-items: center;
   height: 100%;
-  background: linear-gradient(180deg, #215f98 -36.34%, #000 100%);
+  background: linear-gradient(180deg, #000 0%, #011439 100%); 
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .imgBackground {
@@ -80,12 +84,12 @@
 .usernameStyleMobile {
   display: flex;
   align-items: center;
-  width: 350px;
+  width: 300px;
   height: 50px;
   border-radius: 5px;
   border: 1px solid transparent;
-  padding-left: 10px;
-  border-radius: 100px;
+  padding-left: 0px;
+  border-radius: 5px;
   background: #ffffff;
 }
 
@@ -104,12 +108,11 @@
 .passwordStyleMobile {
   display: flex;
   align-items: center;
-  width: 350px;
+  width: 300px;
   height: 50px;
   border-radius: 5px;
   border: 1px solid transparent;
-  padding-left: 10px;
-  border-radius: 100px;
+  border-radius: 5px;
   background: #ffff;
 }
 
@@ -120,7 +123,7 @@
   width: 350px;
   height: 50px;
   font-weight: regular;
-  font-size: 18px;
+  font-size: 22px;
   color: #fff;
   margin-top: 10px;
   cursor: pointer;
@@ -133,14 +136,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 350px;
+  width: 300px;
   height: 50px;
   font-weight: regular;
-  font-size: 18px;
+  font-size: 22px;
   color: #011439;
   margin-top: 10px;
   cursor: pointer;
-  border-radius: 100px;
+  border-radius: 5px;
   border: 1px solid transparent;
   background: #55edf6;
+}
+
+.successGreen{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  background-color: rgb(7, 201, 7);
+}
+
+.successRed{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  height: 50px;
+  color: #fff;
+  background-color: rgb(248, 8, 0);
 }

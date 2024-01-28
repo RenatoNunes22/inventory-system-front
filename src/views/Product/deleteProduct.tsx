@@ -16,12 +16,14 @@ import { Device } from '../../model/Device'
 import { formatarData } from '../../utils/formatterData'
 import { Accessories } from '../../model/Accessories'
 import Snackbars from '../../components/SnackBar'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 type DeleteProductProps = {
     productType: string
 }
 
 export default function DeleteProduct({ productType }: DeleteProductProps) {
+    const isMobile = useMedia('(max-width: 850px)')
     const [listDevice, setListDevice] = React.useState<Device[]>()
     const [listAccessories, setListAccessories] = React.useState<Accessories[]>()
     const [search, setSearch] = React.useState<number | string>('')
@@ -146,7 +148,6 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
             lg={12}
             xl={12}
             gap={2}
-            width={'100vw'}
         >
             <Grid
                 item
@@ -158,8 +159,17 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                 lg={12}
                 xl={3}
                 gap={1}
+                style={{ width: isMobile ? '100%' : '300px' }}
             >
-                <Box sx={{ minWidth: '200px', width: '300px' }}>
+                <Box
+                    sx={{
+                        minWidth: '200px',
+                        width: isMobile ? '100%' : '300px',
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        gap: '10px',
+                    }}
+                >
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Selecione o produto</InputLabel>
                         <Select
@@ -180,18 +190,18 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                                   ))}
                         </Select>
                     </FormControl>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            height: '55px',
+                            backgroundColor: '#5e6464',
+                            color: '#FFFF',
+                        }}
+                        onClick={searchProduct}
+                    >
+                        <SearchIcon />
+                    </Button>
                 </Box>
-                <Button
-                    variant="contained"
-                    sx={{
-                        height: '55px',
-                        backgroundColor: '#5e6464',
-                        color: '#FFFF',
-                    }}
-                    onClick={searchProduct}
-                >
-                    <SearchIcon />
-                </Button>
             </Grid>
             {(device || accessories) && (
                 <Grid
@@ -210,7 +220,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                     <Grid
                         item
                         display={'flex'}
-                        direction={'row'}
+                        direction={isMobile ? 'column' : 'row'}
                         alignItems={'center'}
                         justifyContent={'start'}
                         gap={2}
@@ -253,7 +263,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                     <Grid
                         item
                         display={'flex'}
-                        direction={'row'}
+                        direction={isMobile ? 'column' : 'row'}
                         alignItems={'center'}
                         justifyContent={'start'}
                         xs={12}
@@ -316,7 +326,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                     <Grid
                         item
                         display={'flex'}
-                        direction={'row'}
+                        direction={isMobile ? 'column' : 'row'}
                         alignItems={'center'}
                         justifyContent={'start'}
                         xs={12}
@@ -353,12 +363,12 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                         type={message !== 'Produto deletado com sucesso!' ? 'error' : 'success'}
                         open={open}
                     />
-                    <Grid item display={'flex'} justifyContent={'end'} width={'100%'}>
+                    <Grid item display={'flex'} justifyContent={isMobile ? 'center' : 'end'} width={'100%'}>
                         <Button
                             variant="contained"
                             onClick={deleteProduct}
                             sx={{
-                                width: '200px',
+                                width: isMobile ? '100%' : '200px',
                                 backgroundColor: '#5e6464',
                                 color: '#FFFF',
                             }}
