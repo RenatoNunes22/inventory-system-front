@@ -16,7 +16,7 @@ export const Sold: React.FC = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (!access) {
+        if (!access || access === '') {
             navigate('/')
         }
     }, [])
