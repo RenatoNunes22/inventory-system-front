@@ -30,6 +30,8 @@ export const Login: React.FC = () => {
     }
 
     useEffect(() => {
+        setRole('')
+        setUser('')
         setToken('')
     }, [])
 
