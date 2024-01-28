@@ -1,8 +1,9 @@
-import { Button, FormControl, Grid, InputAdornment, InputLabel, OutlinedInput, TextField } from '@mui/material'
+import { Button, Grid, InputAdornment, TextField } from '@mui/material'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import Snackbars from '../../components/SnackBar'
 import { useMedia } from '../../hooks/mediaQueryHook'
+import InputMask from 'react-input-mask'
 
 type InsertProductProps = {
     productType: string
@@ -95,40 +96,27 @@ export default function InsertProduct({ productType }: InsertProductProps) {
             >
                 <TextField
                     fullWidth
-                    required
                     id="outlined-basic"
-                    label={productType === 'Device' ? 'Nome do aparelho' : 'Nome do acessorio'}
+                    label={productType === 'Device' ? 'Nome do aparelho' : 'Nome do acessório'}
                     variant="outlined"
                     value={nameDevice}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setNameDevice(event.target.value)
                     }}
                 />
-                <FormControl fullWidth>
-                    <InputLabel htmlFor="outlined-adornment-amount">Valor do produto</InputLabel>
-                    <OutlinedInput
-                        id="outlined-adornment-amount"
-                        startAdornment={value !== '' ? <InputAdornment position="start">R$</InputAdornment> : null}
-                        label="Valor do produto"
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            setValue(event.target.value)
-                        }}
-                    />
-                </FormControl>
-                {/* <TextField
-                    fullWidth
-                    required
-                    id="outlined-basic"
-                    label="Valor do aparelho"
-                    variant="outlined"
+                <InputMask
+                    mask="R$: 999999"
+                    maskPlaceholder={null}
                     value={value}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setValue(event.target.value)
                     }}
-                /> */}
+                >
+                    <TextField fullWidth id="outlined-basic" label="Valor do produto" variant="outlined" />
+                </InputMask>
+
                 <TextField
                     fullWidth
-                    required
                     id="outlined-basic"
                     label="Tipo do aparelho"
                     variant="outlined"
@@ -148,54 +136,65 @@ export default function InsertProduct({ productType }: InsertProductProps) {
             >
                 {productType === 'Device' ? (
                     <>
-                        <TextField
-                            required
-                            fullWidth
-                            id="outlined-basic"
-                            label="Numero de série"
-                            variant="outlined"
+                        <InputMask
+                            mask=""
+                            maskPlaceholder={null}
                             value={seriesNumber}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setSeriesNumber(event.target.value)
                             }}
-                        />
-                        <TextField
-                            required
-                            fullWidth
-                            id="outlined-basic"
-                            label="Estado da bateria"
-                            variant="outlined"
+                        >
+                            <TextField fullWidth id="outlined-basic" label="Número de série" variant="outlined" />
+                        </InputMask>
+                        <InputMask
+                            mask={'999'}
+                            maskPlaceholder={null}
                             value={stateBattery}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                 setStateBattery(event.target.value)
                             }}
-                        />
+                        >
+                            <TextField
+                                InputProps={{
+                                    endAdornment: <InputAdornment position="start">%</InputAdornment>,
+                                }}
+                                fullWidth
+                                id="outlined-basic"
+                                label="Estado da bateria"
+                                variant="outlined"
+                            />
+                        </InputMask>
                     </>
                 ) : (
-                    <TextField
-                        required
-                        fullWidth
-                        id="outlined-basic"
-                        label="Quantidade"
-                        variant="outlined"
+                    <InputMask
+                        mask={'99999'}
+                        maskPlaceholder={null}
                         value={quantity}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setQuantity(event.target.value)
                         }}
-                    />
+                    >
+                        <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
+                    </InputMask>
                 )}
-
-                <TextField
-                    required
-                    fullWidth
-                    id="outlined-basic"
-                    label="Desconto máximo"
-                    variant="outlined"
+                <InputMask
+                    mask="99"
+                    maskPlaceholder={null}
                     value={maxDiscountAmout}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setMaxDiscountAmout(event.target.value)
                     }}
-                />
+                >
+                    <TextField
+                        InputProps={{
+                            endAdornment: <InputAdornment position="start">%</InputAdornment>,
+                        }}
+                        fullWidth
+                        id="outlined-basic"
+                        label="Desconto máximo"
+                        variant="outlined"
+                    />
+                </InputMask>
             </Grid>
             <TextField
                 fullWidth
