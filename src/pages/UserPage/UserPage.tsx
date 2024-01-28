@@ -1,6 +1,6 @@
 import { Button, Grid } from '@mui/material'
 import './style.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete'
 import SyncAltIcon from '@mui/icons-material/SyncAlt'
 import TableViewIcon from '@mui/icons-material/TableView'
@@ -11,11 +11,20 @@ import ViewStockUser from '../../views/User/viewStockUsers'
 import UpdateUser from '../../views/User/updateUser'
 import DeleteUser from '../../views/User/deleteUser'
 import { useMedia } from '../../hooks/mediaQueryHook'
+import { useNavigate } from 'react-router-dom'
 
 export const User: React.FC = () => {
     const isMobile = useMedia('(max-width: 600px)')
     const switchName = useMedia('(max-width: 850px)')
     const [controlButton, setControlButton] = useState<'insert' | 'delete' | 'red' | 'update'>('insert')
+    const access = localStorage.getItem('role')
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (!access) {
+            navigate('/')
+        }
+    }, [])
 
     return (
         <Grid

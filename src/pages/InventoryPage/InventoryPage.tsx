@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/prefer-as-const */
 import { Button, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup } from '@mui/material'
 import './style.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import ViewStockDevice from '../../views/Product/viewStockDevice'
 import ViewStockAccesories from '../../views/Product/viewStockAccessories'
@@ -13,12 +13,21 @@ import TableViewIcon from '@mui/icons-material/TableView'
 import AddIcon from '@mui/icons-material/Add'
 import InsertProduct from '../../views/Product/insertProduct'
 import { useMedia } from '../../hooks/mediaQueryHook'
+import { useNavigate } from 'react-router-dom'
 
 export const Inventory: React.FC = () => {
     const [controlButton, setControlButton] = useState<'insert' | 'delete' | 'red' | 'update'>('insert')
+    const [productType, setProductType] = useState<string>('Device')
     const isMobile = useMedia('(max-width: 600px)')
     const switchName = useMedia('(max-width: 850px)')
-    const [productType, setProductType] = useState<string>('Device')
+    const access = localStorage.getItem('role')
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (!access) {
+            navigate('/')
+        }
+    }, [])
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setProductType((event.target as HTMLInputElement).value)

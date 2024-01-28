@@ -2,15 +2,25 @@ import './style.css'
 import { Button, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup } from '@mui/material'
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded'
 import TableViewIcon from '@mui/icons-material/TableView'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import SoldProduct from '../../views/Sold/SoldProduct'
 import ViewStockSoldDevice from '../../views/Sold/viewStockSoldDevice'
 import { useMedia } from '../../hooks/mediaQueryHook'
+import { useNavigate } from 'react-router-dom'
 
 export const Sold: React.FC = () => {
     const [controlButton, setControlButton] = useState<'sold' | 'history'>('sold')
     const [productType, setProductType] = useState<string>('Device')
     const isMobile = useMedia('(max-width: 1250px)')
+    const access = localStorage.getItem('role')
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (!access) {
+            navigate('/')
+        }
+    }, [])
+
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setProductType((event.target as HTMLInputElement).value)
     }
