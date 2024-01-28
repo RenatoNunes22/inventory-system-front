@@ -561,14 +561,14 @@ export default function SoldProduct({ productType }: InsertProductProps) {
             <Grid
                 item
                 display={'flex'}
-                justifyContent={'end'}
+                justifyContent={isMobile ? 'center' : 'end'}
                 gap={'20px'}
                 style={{ width: '100%', marginTop: '20px' }}
             >
                 <Button
                     variant="contained"
                     sx={{
-                        width: '200px',
+                        width: isMobile ? '100%' : '200px',
                         backgroundColor: '#2b98c4',
                         color: '#FFFF',
                     }}

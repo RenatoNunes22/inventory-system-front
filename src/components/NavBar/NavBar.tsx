@@ -57,12 +57,15 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                 sx={{
                     backgroundColor: color,
                     margin: 0,
-                    padding: '30px 50px',
+                    padding: isMobile ? '30px 25px' : '30px 50px',
                     marginBottom: '5%',
                 }}
             >
                 <img src={modeTheme ? Logo : LogoWhite} width={isMobile ? '150px' : '130px'} />
-                <div className="containerButtons" style={{ gap: '40px' }}>
+                <div
+                    className="containerButtons"
+                    style={{ gap: isMobile ? '20px' : '40px', width: isMobile ? '100%' : '' }}
+                >
                     <Button
                         onClick={() => {
                             setClick('Vendas')

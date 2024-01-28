@@ -1,8 +1,8 @@
+import './style.css'
 import { Button, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup } from '@mui/material'
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded'
 import TableViewIcon from '@mui/icons-material/TableView'
 import { useState } from 'react'
-import './style.css'
 import SoldProduct from '../../views/Sold/SoldProduct'
 import ViewStockSoldDevice from '../../views/Sold/viewStockSoldDevice'
 import { useMedia } from '../../hooks/mediaQueryHook'
@@ -71,7 +71,7 @@ export const Sold: React.FC = () => {
                                 }}
                             >
                                 <ShoppingCartRoundedIcon />
-                                Realizar venda
+                                {isMobile ? 'Vender' : 'Realizar venda'}
                             </div>
                         </Button>
                         <Button
@@ -90,7 +90,7 @@ export const Sold: React.FC = () => {
                                 }}
                             >
                                 <TableViewIcon />
-                                Historico de venda
+                                {isMobile ? 'Historico' : 'Historico de venda'}
                             </div>
                         </Button>
                     </Grid>
@@ -140,12 +140,14 @@ export const Sold: React.FC = () => {
                                     value={productType}
                                     onChange={handleChange}
                                 >
-                                    <FormControlLabel
-                                        value="Device"
-                                        control={<Radio defaultChecked={true} />}
-                                        label="Aparelhos"
-                                    />
-                                    <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
+                                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                        <FormControlLabel
+                                            value="Device"
+                                            control={<Radio defaultChecked={true} />}
+                                            label="Aparelhos"
+                                        />
+                                        <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
+                                    </div>
                                 </RadioGroup>
                             </FormControl>
 
