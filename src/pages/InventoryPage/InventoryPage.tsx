@@ -24,7 +24,11 @@ export const Inventory: React.FC = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (!access || access === '') {
+        if (access) {
+            if (access.length >= 2) {
+                navigate('/')
+            }
+        } else {
             navigate('/')
         }
     }, [])
