@@ -5,11 +5,12 @@ import { useState } from 'react'
 import './style.css'
 import SoldProduct from '../../views/Sold/SoldProduct'
 import ViewStockSoldDevice from '../../views/Sold/viewStockSoldDevice'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 export const Sold: React.FC = () => {
     const [controlButton, setControlButton] = useState<'sold' | 'history'>('sold')
     const [productType, setProductType] = useState<string>('Device')
-
+    const isMobile = useMedia('(max-width: 1250px)')
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setProductType((event.target as HTMLInputElement).value)
     }
@@ -99,8 +100,8 @@ export const Sold: React.FC = () => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             flexDirection: 'column',
-                            width: '90%',
-                            padding: '15px',
+                            width: isMobile ? '100%' : '90%',
+                            padding: isMobile ? '10px' : '15px',
                             marginTop: '10px',
                             borderRadius: '16px',
                             background: 'rgba(248, 249, 251, 0.15)',
@@ -121,7 +122,14 @@ export const Sold: React.FC = () => {
                                 boxShadow: '5px 5px 30px 0px rgba(0, 0, 0, 0.30)',
                             }}
                         >
-                            <FormControl>
+                            <FormControl
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                            >
                                 <FormLabel color="primary" id="demo-row-radio-buttons-group-label">
                                     Selecione o tipo do produto
                                 </FormLabel>
@@ -140,6 +148,7 @@ export const Sold: React.FC = () => {
                                     <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
                                 </RadioGroup>
                             </FormControl>
+
                             {controlButton === 'sold' ? (
                                 <div className="title">
                                     <ShoppingCartRoundedIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />

@@ -20,12 +20,14 @@ import { Device } from '../../model/Device'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import { Client } from '../../model/Client'
 import InputMask from 'react-input-mask'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 type InsertProductProps = {
     productType: string
 }
 
 export default function SoldProduct({ productType }: InsertProductProps) {
+    const isMobile = useMedia('(max-width: 1220px)')
     const user = localStorage.getItem('user')?.replace(/"/g, '')
     const [listDevice, setListDevice] = useState<Device[]>()
     const [listAccessories, setListAccessories] = useState<Accessories[]>()
@@ -278,7 +280,14 @@ export default function SoldProduct({ productType }: InsertProductProps) {
 
     return (
         <>
-            <Grid item display={'flex'} flexDirection={'row'} alignItems={'start'} gap="20px" style={{ width: '100%' }}>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={isMobile ? 'column' : 'row'}
+                alignItems={'start'}
+                gap="20px"
+                style={{ width: '100%' }}
+            >
                 <Box sx={{ minWidth: '200px', width: '100%' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Selecione o produto</InputLabel>
@@ -324,25 +333,23 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         </Select>
                     </FormControl>
                 </Box>
-                {selectedPayment === 'Cartão de crédito' && (
-                    <FormControl fullWidth>
-                        <InputLabel htmlFor="outlined-adornment-amount">Valor do produto</InputLabel>
-                        <OutlinedInput
-                            error={fees && isNaN(Number(fees)) ? true : false}
-                            id="outlined-adornment-amount"
-                            startAdornment={fees !== '' ? <InputAdornment position="start">R$</InputAdornment> : null}
-                            label="Valor da tarifa"
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setFees(event.target.value)
-                            }}
-                        />
-                        {fees && isNaN(Number(fees)) && (
-                            <FormHelperText error id="accountId-error">
-                                Apenas números
-                            </FormHelperText>
-                        )}
-                    </FormControl>
-                )}
+                <FormControl fullWidth>
+                    <InputLabel htmlFor="outlined-adornment-amount">Valor da tarifa</InputLabel>
+                    <OutlinedInput
+                        error={fees && isNaN(Number(fees)) ? true : false}
+                        id="outlined-adornment-amount"
+                        startAdornment={fees !== '' ? <InputAdornment position="start">R$</InputAdornment> : null}
+                        label="Valor da tarifa"
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setFees(event.target.value)
+                        }}
+                    />
+                    {fees && isNaN(Number(fees)) && (
+                        <FormHelperText error id="accountId-error">
+                            Apenas números
+                        </FormHelperText>
+                    )}
+                </FormControl>
                 {productType === 'Device' ? (
                     <Box sx={{ minWidth: '200px', width: '100%' }}>
                         <FormControl fullWidth>
@@ -398,7 +405,13 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     Detalhes do cliente
                 </div>
             </Grid>
-            <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={isMobile ? 'column' : 'row'}
+                gap={'20px'}
+                style={{ width: '100%' }}
+            >
                 <InputMask
                     mask="999.999.999-99"
                     maskPlaceholder={null}
@@ -431,7 +444,13 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     }}
                 />
             </Grid>
-            <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={isMobile ? 'column' : 'row'}
+                gap={'20px'}
+                style={{ width: '100%' }}
+            >
                 <InputMask mask="99/99/9999" maskPlaceholder={null} value={dn} onChange={(e) => setDn(e.target.value)}>
                     <TextField fullWidth label="Data de nascimento" />
                 </InputMask>
@@ -456,7 +475,13 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     <TextField fullWidth id="outlined-basic" label="CEP" variant="outlined" />
                 </InputMask>
             </Grid>
-            <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={isMobile ? 'column' : 'row'}
+                gap={'20px'}
+                style={{ width: '100%' }}
+            >
                 <TextField
                     fullWidth
                     id="outlined-basic"
@@ -491,7 +516,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
             <Grid
                 item
                 display={'flex'}
-                flexDirection={'row'}
+                flexDirection={isMobile ? 'column' : 'row'}
                 justifyContent={'start'}
                 gap={'20px'}
                 style={{ width: '100%' }}

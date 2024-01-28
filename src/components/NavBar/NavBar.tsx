@@ -7,6 +7,7 @@ import { useLocation } from 'react-router-dom'
 import Logo from '../../assets/Logo.png'
 import LogoWhite from '../../assets/LogoWhite.png'
 import { useNavigate } from 'react-router-dom'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 export type navBarProps = {
     color?: string
@@ -16,6 +17,7 @@ export type navBarProps = {
 }
 
 export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
+    const isMobile = useMedia('(max-width: 1050px)')
     const [click, setClick] = useState('')
     const navigate = useNavigate()
     const path = useLocation()
@@ -45,8 +47,9 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
             <Grid
                 container={true}
                 display={'flex'}
-                direction={'row'}
+                direction={isMobile ? 'column' : 'row'}
                 alignItems={'center'}
+                gap={isMobile ? 5 : 0}
                 justifyContent={'space-between'}
                 xs={12}
                 lg={12}
@@ -58,7 +61,7 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                     marginBottom: '5%',
                 }}
             >
-                <img src={modeTheme ? Logo : LogoWhite} width={'130px'} />
+                <img src={modeTheme ? Logo : LogoWhite} width={isMobile ? '150px' : '130px'} />
                 <div className="containerButtons" style={{ gap: '40px' }}>
                     <Button
                         onClick={() => {
