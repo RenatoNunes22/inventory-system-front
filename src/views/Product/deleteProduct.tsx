@@ -46,6 +46,8 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
         setAccessories(undefined)
     }, [search])
 
+    console.log(search)
+
     const searchProduct = () => {
         if (productType === 'Device') {
             axios

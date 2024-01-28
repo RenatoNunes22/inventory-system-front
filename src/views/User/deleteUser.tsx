@@ -224,7 +224,7 @@ export default function DeleteUser() {
                     </Grid>
                     <Snackbars
                         message={message}
-                        type={message !== 'Usuário atualizado com sucesso!' ? 'error' : 'success'}
+                        type={message !== 'Usuário deletado com sucesso!' ? 'error' : 'success'}
                         open={open}
                     />
                     <Grid item display={'flex'} justifyContent={'end'} width={'100%'}>
