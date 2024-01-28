@@ -236,6 +236,32 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         }
     }
 
+    const IssueNote = () => {
+        axios
+            .post(`${import.meta.env.VITE_API_URI}/sendEmail`, {
+                email: email,
+                cpf: cpf,
+                name: nameClient,
+                value: value,
+                phone: phone,
+                cep: cep,
+                state: state,
+                city: city,
+                neighborhood: neighborhood,
+                street: street,
+                number: number,
+                complement: complement,
+                product: seletedDevice?.name,
+                formPayment: selectedPayment,
+            })
+            .catch((err) => console.log(err))
+    }
+
+    const makeSale = () => {
+        IssueNote()
+        soldProduct()
+    }
+
     return (
         <>
             <Grid item display={'flex'} flexDirection={'row'} alignItems={'start'} gap="20px" style={{ width: '100%' }}>
@@ -503,7 +529,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         color: '#FFFF',
                     }}
                     disabled={check ? false : true}
-                    onClick={soldProduct}
+                    onClick={makeSale}
                 >
                     Vender produto
                 </Button>
