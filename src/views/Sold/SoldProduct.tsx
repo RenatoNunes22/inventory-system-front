@@ -151,9 +151,9 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [search])
 
     useEffect(() => {
-        setSeletedDevice(undefined)
-        setSeletedAccessories(undefined)
-        setSeletedClient(undefined)
+        setSeletedDevice({} as Device)
+        setSeletedAccessories({} as Accessories)
+        setSeletedClient({} as Client)
     }, [productType])
 
     useEffect(() => {
@@ -188,8 +188,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         street,
         number,
     ])
-
-    console.log(cep)
 
     const soldProduct = () => {
         if (selectedClient === undefined) {
@@ -278,6 +276,9 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         soldProduct()
     }
 
+    console.log(seletedDevice)
+    console.log(seletedAccessories)
+
     return (
         <>
             <Grid
@@ -299,7 +300,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                                     ? seletedDevice?.seriesNumber
                                     : seletedAccessories
                                     ? seletedAccessories?.name
-                                    : ''
+                                    : undefined
                             }
                             label="Selecione o produto"
                             onChange={handleChange}
