@@ -13,7 +13,17 @@ import { SoldDevice } from '../../model/SoldDevice'
 import { formatarData } from '../../utils/formatterData'
 
 interface Column {
-    id: 'name' | 'soldValue' | 'seriesNumber' | 'expenses' | 'fees' | 'formPayment' | 'client' | 'seller' | 'createdAt'
+    id:
+        | 'name'
+        | 'soldValue'
+        | 'seriesNumber'
+        | 'gift'
+        | 'expenses'
+        | 'fees'
+        | 'formPayment'
+        | 'client'
+        | 'seller'
+        | 'createdAt'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -26,6 +36,13 @@ const columns: readonly Column[] = [
     {
         id: 'seriesNumber',
         label: 'Numero de serie',
+        minWidth: 170,
+        align: 'center',
+        format: (value: number) => value.toLocaleString('en-US'),
+    },
+    {
+        id: 'gift',
+        label: 'Brinde',
         minWidth: 170,
         align: 'center',
         format: (value: number) => value.toLocaleString('en-US'),
@@ -78,6 +95,7 @@ function createData(
     name: string,
     soldValue: string,
     seriesNumber: string,
+    gift: string,
     expenses: string,
     fees: string,
     formPayment: string,
@@ -89,6 +107,7 @@ function createData(
         name,
         soldValue,
         seriesNumber,
+        gift,
         expenses,
         fees,
         formPayment,
@@ -131,6 +150,7 @@ export default function ViewStockSoldDevice() {
             name: '',
             soldValue: '',
             seriesNumber: '',
+            gift: '',
             expenses: '',
             fees: '',
             formPayment: '',
@@ -153,6 +173,7 @@ export default function ViewStockSoldDevice() {
                         data.name,
                         data.soldValue,
                         data.seriesNumber,
+                        data.gift,
                         data.expenses,
                         data.fees,
                         data.formPayment,

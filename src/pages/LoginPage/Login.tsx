@@ -18,6 +18,7 @@ export const Login: React.FC = () => {
 
     const [, setToken] = useLocalStorage('token', '')
     const [, setUser] = useLocalStorage('user', '')
+    const [, setRole] = useLocalStorage('role', '')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -41,6 +42,7 @@ export const Login: React.FC = () => {
                 if (response.status === 200) {
                     setUser(response.data.cpf)
                     setToken(response.data.token)
+                    setRole(response.data.role)
                     if (response.data.role === 1) {
                         navigate('/Inventory')
                     } else {

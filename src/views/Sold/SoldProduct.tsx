@@ -2,6 +2,7 @@ import {
     Box,
     Button,
     FormControl,
+    FormHelperText,
     Grid,
     InputAdornment,
     InputLabel,
@@ -18,6 +19,7 @@ import { Accessories } from '../../model/Accessories'
 import { Device } from '../../model/Device'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import { Client } from '../../model/Client'
+import InputMask from 'react-input-mask'
 
 type InsertProductProps = {
     productType: string
@@ -31,6 +33,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const [seletedDevice, setSeletedDevice] = useState<Device>()
     const [seletedAccessories, setSeletedAccessories] = useState<Accessories>()
     const [seletedClient, setSeletedClient] = useState<Client>()
+    const [gift, setGift] = useState<string>()
 
     //CLIENT
     const [selectedClient, setSelectedClient] = useState<Client>()
@@ -58,10 +61,13 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const [check, setCheck] = useState<boolean>(false)
     const [selectedPayment, setSelectedPayment] = useState<string>('')
     const formPayment = ['Dinheiro', 'Cartão de crédito', 'Cartão de débito', 'Pix', 'Boleto']
+    const caracteresARemover = /[.\-_]/g
 
     useEffect(() => {
-        if (cep.length === 8 && !selectedClient) {
-            axios.get(`https://viacep.com.br/ws/${cep}/json/`).then((res) => {
+        const newCEP = cep.replace(caracteresARemover, '')
+        if (newCEP.length === 8 && !selectedClient) {
+            console.log('entrou')
+            axios.get(`https://viacep.com.br/ws/${newCEP}/json/`).then((res) => {
                 setState(res.data.uf)
                 setCity(res.data.localidade)
                 setNeighborhood(res.data.bairro)
@@ -76,8 +82,9 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [cep])
 
     useEffect(() => {
-        if (!isNaN(Number(cpf)) && cpf.length === 11) {
-            axios.get(`${import.meta.env.VITE_API_URI}/clients/${cpf}`).then((res) => {
+        const newCPF = cpf.replace(caracteresARemover, '')
+        if (newCPF.length === 11) {
+            axios.get(`${import.meta.env.VITE_API_URI}/clients/${newCPF}`).then((res) => {
                 setSelectedClient(res.data[0])
                 setNameClient(res.data[0].name)
                 setEmail(res.data[0].email)
@@ -91,6 +98,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 setNumber(res.data[0].number)
             })
         } else {
+            setSelectedClient(undefined)
             setNameClient('')
             setEmail('')
             setDn('')
@@ -115,8 +123,11 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [productType, open])
 
     const handleChange = (event: SelectChangeEvent) => {
-        console.log(event.target.value)
         setSearch(event.target.value)
+    }
+
+    const handleChangeGift = (event: SelectChangeEvent) => {
+        setGift(event.target.value)
     }
 
     const handleChangeFormPayment = (event: SelectChangeEvent) => {
@@ -176,6 +187,8 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         number,
     ])
 
+    console.log(cep)
+
     const soldProduct = () => {
         if (selectedClient === undefined) {
             axios.post(`${import.meta.env.VITE_API_URI}/clients`, {
@@ -204,6 +217,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     formPayment: selectedPayment,
                     client: cpf,
                     seller: user,
+                    gift: gift,
                 })
                 .then((res) => {
                     setMessage(res.data)
@@ -311,16 +325,23 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     </FormControl>
                 </Box>
                 {selectedPayment === 'Cartão de crédito' && (
-                    <TextField
-                        fullWidth
-                        id="outlined-basic"
-                        label="Valor da tarifa"
-                        variant="outlined"
-                        value={fees ? fees : undefined}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            setFees(event.target.value)
-                        }}
-                    />
+                    <FormControl fullWidth>
+                        <InputLabel htmlFor="outlined-adornment-amount">Valor do produto</InputLabel>
+                        <OutlinedInput
+                            error={fees && isNaN(Number(fees)) ? true : false}
+                            id="outlined-adornment-amount"
+                            startAdornment={fees !== '' ? <InputAdornment position="start">R$</InputAdornment> : null}
+                            label="Valor da tarifa"
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setFees(event.target.value)
+                            }}
+                        />
+                        {fees && isNaN(Number(fees)) && (
+                            <FormHelperText error id="accountId-error">
+                                Apenas números
+                            </FormHelperText>
+                        )}
+                    </FormControl>
                 )}
                 {productType === 'Device' ? (
                     <Box sx={{ minWidth: '200px', width: '100%' }}>
@@ -329,9 +350,9 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
-                                value={''}
+                                value={gift ? gift : undefined}
                                 label="Selecione um brinde"
-                                //onChange={handleChange}
+                                onChange={handleChangeGift}
                             >
                                 {listAccessories?.map((accessories: Accessories) => (
                                     <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
@@ -356,12 +377,18 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     <InputLabel htmlFor="outlined-adornment-amount">Valor do produto</InputLabel>
                     <OutlinedInput
                         id="outlined-adornment-amount"
+                        error={value && isNaN(Number(value)) ? true : false}
                         startAdornment={value !== '' ? <InputAdornment position="start">R$</InputAdornment> : null}
                         label="Valor do produto"
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setValue(event.target.value)
                         }}
                     />
+                    {value && isNaN(Number(value)) && (
+                        <FormHelperText error id="accountId-error">
+                            Apenas números
+                        </FormHelperText>
+                    )}
                 </FormControl>
             </Grid>
 
@@ -372,18 +399,16 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 </div>
             </Grid>
             <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
-                <TextField
-                    required
-                    fullWidth
-                    id="outlined-basic"
-                    label="CPF"
-                    variant="outlined"
-                    value={seletedClient?.cpf ? seletedClient.cpf : cpf}
+                <InputMask
+                    mask="999.999.999-99"
+                    maskPlaceholder={null}
+                    value={cpf}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setCPF(event.target.value)
                     }}
-                />
-
+                >
+                    <TextField fullWidth id="outlined-basic" label="CPF" variant="outlined" />
+                </InputMask>
                 <TextField
                     required
                     fullWidth
@@ -407,36 +432,29 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 />
             </Grid>
             <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Data de nascimento"
-                    variant="outlined"
-                    value={seletedClient?.dn ? seletedClient.dn : dn}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setDn(event.target.value)
-                    }}
-                />
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Telefone"
-                    variant="outlined"
+                <InputMask mask="99/99/9999" maskPlaceholder={null} value={dn} onChange={(e) => setDn(e.target.value)}>
+                    <TextField fullWidth label="Data de nascimento" />
+                </InputMask>
+                <InputMask
+                    mask="(99)99999-9999"
+                    maskPlaceholder={null}
                     value={seletedClient?.telephone ? seletedClient.telephone : phone}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setPhone(event.target.value)
                     }}
-                />
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="CEP"
-                    variant="outlined"
+                >
+                    <TextField fullWidth id="outlined-basic" label="Telefone" variant="outlined" />
+                </InputMask>
+                <InputMask
+                    mask="99.999-999"
+                    maskPlaceholder={null}
                     value={cep}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setCep(event.target.value)
                     }}
-                />
+                >
+                    <TextField fullWidth id="outlined-basic" label="CEP" variant="outlined" />
+                </InputMask>
             </Grid>
             <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
                 <TextField
@@ -488,16 +506,17 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         setStreet(event.target.value)
                     }}
                 />
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Número"
-                    variant="outlined"
+                <InputMask
+                    mask="99999"
+                    maskPlaceholder={null}
                     value={number}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setNumber(event.target.value)
                     }}
-                />
+                >
+                    <TextField fullWidth label="Número" />
+                </InputMask>
+
                 <TextField
                     fullWidth
                     id="outlined-basic"

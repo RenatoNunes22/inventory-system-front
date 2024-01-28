@@ -38,6 +38,8 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
     //     cursor: 'pointer',
     // }
 
+    const role = localStorage.getItem('role')
+
     if (pathname !== '/') {
         return (
             <Grid
@@ -68,27 +70,30 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                     >
                         <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Vendas</div>
                     </Button>
-                    <Button
-                        onClick={() => {
-                            setClick('Gerenciamento de estoque')
-                            navigate('/Inventory')
-                        }}
-                        sx={{ borderRadius: 0, color: '#FFF' }}
-                        className={`button ${click === 'Gerenciamento de estoque' ? 'clicado' : ''}`}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Estoque</div>
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            setClick('Usuarios')
-                            navigate('/User')
-                        }}
-                        sx={{ borderRadius: 0, color: '#FFF' }}
-                        className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Usuarios</div>
-                    </Button>
-
+                    {role == '1' && (
+                        <>
+                            <Button
+                                onClick={() => {
+                                    setClick('Gerenciamento de estoque')
+                                    navigate('/Inventory')
+                                }}
+                                sx={{ borderRadius: 0, color: '#FFF' }}
+                                className={`button ${click === 'Gerenciamento de estoque' ? 'clicado' : ''}`}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Estoque</div>
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setClick('Usuarios')
+                                    navigate('/User')
+                                }}
+                                sx={{ borderRadius: 0, color: '#FFF' }}
+                                className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Usuarios</div>
+                            </Button>
+                        </>
+                    )}
                     {/* <Button
                         onClick={() => {
                             setClick('Area admnistrativa')
