@@ -16,8 +16,10 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import Snackbars from '../../components/SnackBar'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 export default function InsertUser() {
+    const isMobile = useMedia('(max-width: 850px)')
     const [email, setEmail] = useState<string>('')
     const [cpf, setCpf] = useState<string>('')
     const [name, setName] = useState<string>('')
@@ -73,7 +75,14 @@ export default function InsertUser() {
 
     return (
         <>
-            <Grid item display={'flex'} gap="20px" paddingTop={'20px'} style={{ width: '100%' }}>
+            <Grid
+                item
+                display={'flex'}
+                gap="20px"
+                flexDirection={isMobile ? 'column' : 'row'}
+                paddingTop={'20px'}
+                style={{ width: '100%' }}
+            >
                 <TextField
                     fullWidth
                     required
@@ -119,7 +128,13 @@ export default function InsertUser() {
                 />
             </Grid>
 
-            <Grid item display={'flex'} gap={'20px'} style={{ width: '100%' }}>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={isMobile ? 'column' : 'row'}
+                gap={'20px'}
+                style={{ width: '100%' }}
+            >
                 <Box sx={{ minWidth: '200px', width: '100%' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Permissão</InputLabel>
@@ -131,10 +146,10 @@ export default function InsertUser() {
                             label="Permissão"
                             onChange={handleChange}
                         >
-                            <MenuItem value={2} key={2}>
+                            <MenuItem value={1} key={2}>
                                 Administrador
                             </MenuItem>
-                            <MenuItem value={1} key={1}>
+                            <MenuItem value={2} key={1}>
                                 Funcionario
                             </MenuItem>
                         </Select>
@@ -184,7 +199,7 @@ export default function InsertUser() {
             <Button
                 variant="contained"
                 sx={{
-                    width: '250px',
+                    width: isMobile ? '100%' : '200px',
                     backgroundColor: '#2b98c4',
                     color: '#FFFF',
                 }}

@@ -15,8 +15,10 @@ import axios from 'axios'
 import { User } from '../../model/User'
 import { formatarData } from '../../utils/formatterData'
 import Snackbars from '../../components/SnackBar'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 export default function DeleteUser() {
+    const isMobile = useMedia('(max-width: 850px)')
     const [listUser, setListUser] = React.useState<User[]>()
     const [search, setSearch] = React.useState<number | string>('')
     const [user, setUser] = React.useState<User>()
@@ -88,7 +90,6 @@ export default function DeleteUser() {
             lg={12}
             xl={12}
             gap={2}
-            width={'100vw'}
         >
             <Grid
                 item
@@ -100,8 +101,17 @@ export default function DeleteUser() {
                 lg={12}
                 xl={3}
                 gap={1}
+                style={{ width: isMobile ? '100%' : '300px' }}
             >
-                <Box sx={{ minWidth: '200px', width: '300px' }}>
+                <Box
+                    sx={{
+                        minWidth: '200px',
+                        width: isMobile ? '100%' : '300px',
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        gap: '10px',
+                    }}
+                >
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Selecione o usuario</InputLabel>
                         <Select
@@ -116,18 +126,18 @@ export default function DeleteUser() {
                             ))}
                         </Select>
                     </FormControl>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            height: '55px',
+                            backgroundColor: '#5e6464',
+                            color: '#FFFF',
+                        }}
+                        onClick={searchUser}
+                    >
+                        <SearchIcon />
+                    </Button>
                 </Box>
-                <Button
-                    variant="contained"
-                    sx={{
-                        height: '55px',
-                        backgroundColor: '#5e6464',
-                        color: '#FFFF',
-                    }}
-                    onClick={searchUser}
-                >
-                    <SearchIcon />
-                </Button>
             </Grid>
             {user && (
                 <Grid
@@ -146,7 +156,7 @@ export default function DeleteUser() {
                     <Grid
                         item
                         display={'flex'}
-                        direction={'row'}
+                        direction={isMobile ? 'column' : 'row'}
                         alignItems={'center'}
                         justifyContent={'start'}
                         gap={2}
@@ -188,7 +198,7 @@ export default function DeleteUser() {
                     <Grid
                         item
                         display={'flex'}
-                        direction={'row'}
+                        direction={isMobile ? 'column' : 'row'}
                         alignItems={'center'}
                         justifyContent={'start'}
                         xs={12}
@@ -227,12 +237,12 @@ export default function DeleteUser() {
                         type={message !== 'Usuário deletado com sucesso!' ? 'error' : 'success'}
                         open={open}
                     />
-                    <Grid item display={'flex'} justifyContent={'end'} width={'100%'}>
+                    <Grid item display={'flex'} justifyContent={isMobile ? 'center' : 'end'} width={'100%'}>
                         <Button
                             variant="contained"
                             onClick={deleteUser}
                             sx={{
-                                width: '200px',
+                                width: isMobile ? '100%' : '200px',
                                 backgroundColor: '#5e6464',
                                 color: '#FFFF',
                             }}

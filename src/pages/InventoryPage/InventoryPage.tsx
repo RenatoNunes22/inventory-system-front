@@ -76,7 +76,7 @@ export const Inventory: React.FC = () => {
                             >
                                 <div style={{ display: 'flex', alignItems: 'center' }}>
                                     <AddIcon />
-                                    {switchName ? 'Inserir' : 'Inserir produto'}
+                                    {switchName ? 'Adicionar' : 'Adicionar produto'}
                                 </div>
                             </Button>
                             <Button

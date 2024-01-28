@@ -10,8 +10,11 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import ViewStockUser from '../../views/User/viewStockUsers'
 import UpdateUser from '../../views/User/updateUser'
 import DeleteUser from '../../views/User/deleteUser'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 export const User: React.FC = () => {
+    const isMobile = useMedia('(max-width: 600px)')
+    const switchName = useMedia('(max-width: 850px)')
     const [controlButton, setControlButton] = useState<'insert' | 'delete' | 'red' | 'update'>('insert')
 
     return (
@@ -47,62 +50,73 @@ export const User: React.FC = () => {
                     gap={2}
                     paddingBottom={2}
                 >
-                    <Grid
-                        display={'flex'}
-                        direction={'row'}
-                        alignItems={'center'}
-                        justifyContent={'start'}
-                        gap={4}
-                        sx={{ paddingBottom: '20px' }}
-                    >
-                        <Button
-                            onClick={() => {
-                                setControlButton('insert')
-                            }}
-                            sx={{ borderRadius: 0, color: '#FFFF' }}
-                            className={`botao ${controlButton === 'insert' ? 'clicado' : ''}`}
+                    <Grid display={'flex'} direction={'row'} alignItems={'center'} justifyContent={'start'} gap={4}>
+                        <Grid
+                            display={'flex'}
+                            direction={isMobile ? 'column' : 'row'}
+                            alignItems={'center'}
+                            justifyContent={'start'}
+                            gap={4}
+                            sx={{ paddingBottom: '20px' }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <AddIcon />
-                                Adicionar usuario
-                            </div>
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setControlButton('red')
-                            }}
-                            sx={{ borderRadius: 0, color: '#FFFF' }}
-                            className={`botao ${controlButton === 'red' ? 'clicado' : ''}`}
+                            <Button
+                                onClick={() => {
+                                    setControlButton('insert')
+                                }}
+                                sx={{ borderRadius: 0, color: '#FFFF' }}
+                                className={`botao ${controlButton === 'insert' ? 'clicado' : ''}`}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <AddIcon />
+                                    {switchName ? 'Adicionar' : 'Adicionar usuário'}
+                                </div>
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setControlButton('red')
+                                }}
+                                sx={{ borderRadius: 0, color: '#FFFF' }}
+                                className={`botao ${controlButton === 'red' ? 'clicado' : ''}`}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <TableViewIcon />
+                                    {switchName ? 'Visualizar' : 'Visualizar usuários'}
+                                </div>
+                            </Button>
+                        </Grid>
+                        <Grid
+                            display={'flex'}
+                            direction={isMobile ? 'column' : 'row'}
+                            alignItems={'center'}
+                            justifyContent={'start'}
+                            gap={4}
+                            sx={{ paddingBottom: '20px' }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <TableViewIcon />
-                                Visualizar usuarios
-                            </div>
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setControlButton('update')
-                            }}
-                            sx={{ borderRadius: 0, color: '#FFFF' }}
-                            className={`botao ${controlButton === 'update' ? 'clicado' : ''}`}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <SyncAltIcon />
-                                Atualizar usuario
-                            </div>
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setControlButton('delete')
-                            }}
-                            sx={{ borderRadius: 0, color: '#FFFF' }}
-                            className={`botao ${controlButton === 'delete' ? 'clicado' : ''}`}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <DeleteIcon />
-                                Excluir usuario
-                            </div>
-                        </Button>
+                            <Button
+                                onClick={() => {
+                                    setControlButton('update')
+                                }}
+                                sx={{ borderRadius: 0, color: '#FFFF' }}
+                                className={`botao ${controlButton === 'update' ? 'clicado' : ''}`}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <SyncAltIcon />
+                                    {switchName ? 'Atualizar' : 'Atualizar usuário'}
+                                </div>
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setControlButton('delete')
+                                }}
+                                sx={{ borderRadius: 0, color: '#FFFF' }}
+                                className={`botao ${controlButton === 'delete' ? 'clicado' : ''}`}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <DeleteIcon />
+                                    {switchName ? 'Excluir' : 'Excluir usuário'}
+                                </div>
+                            </Button>
+                        </Grid>
                     </Grid>
                     <div
                         style={{
@@ -110,8 +124,8 @@ export const User: React.FC = () => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             flexDirection: 'column',
-                            width: '90%',
-                            padding: '15px',
+                            width: isMobile ? '100%' : '90%',
+                            padding: isMobile ? '10px' : '15px',
                             marginTop: '10px',
                             borderRadius: '16px',
                             background: 'rgba(248, 249, 251, 0.15)',
