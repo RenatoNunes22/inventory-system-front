@@ -68,7 +68,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     useEffect(() => {
         const newCEP = cep.replace(caracteresARemover, '')
         if (newCEP.length === 8 && !selectedClient) {
-            console.log('entrou')
             axios.get(`https://viacep.com.br/ws/${newCEP}/json/`).then((res) => {
                 setState(res.data.uf)
                 setCity(res.data.localidade)
@@ -275,9 +274,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         IssueNote()
         soldProduct()
     }
-
-    console.log(seletedDevice)
-    console.log(seletedAccessories)
 
     return (
         <>
