@@ -1,11 +1,13 @@
 import {
     Box,
     Button,
+    Checkbox,
     FormControl,
     FormHelperText,
     Grid,
     InputAdornment,
     InputLabel,
+    ListItemText,
     MenuItem,
     OutlinedInput,
     Select,
@@ -24,6 +26,17 @@ import { useMedia } from '../../hooks/mediaQueryHook'
 
 type InsertProductProps = {
     productType: string
+}
+
+const ITEM_HEIGHT = 48
+const ITEM_PADDING_TOP = 8
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+            width: 250,
+        },
+    },
 }
 
 export default function SoldProduct({ productType }: InsertProductProps) {
@@ -59,11 +72,26 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const [message, setMessage] = useState<string>('')
     const [open, setOpen] = useState(false)
 
+    const [personName, setPersonName] = useState<string[]>([])
     const [value, setValue] = useState('')
     const [check, setCheck] = useState<boolean>(false)
-    const [selectedPayment, setSelectedPayment] = useState<string>('')
     const formPayment = ['Dinheiro', 'Cartão de crédito', 'Cartão de débito', 'Pix', 'Boleto']
     const caracteresARemover = /[.\-_]/g
+
+    const handleChange = (event: SelectChangeEvent) => {
+        setSearch(event.target.value)
+    }
+
+    const handleChangeGift = (event: SelectChangeEvent) => {
+        setGift(event.target.value)
+    }
+
+    const handleChangePayment = (event: SelectChangeEvent<typeof personName>) => {
+        const {
+            target: { value },
+        } = event
+        setPersonName(typeof value === 'string' ? value.split(',') : value)
+    }
 
     useEffect(() => {
         const newCEP = cep.replace(caracteresARemover, '')
@@ -123,17 +151,12 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         })
     }, [productType, open])
 
-    const handleChange = (event: SelectChangeEvent) => {
-        setSearch(event.target.value)
-    }
-
-    const handleChangeGift = (event: SelectChangeEvent) => {
-        setGift(event.target.value)
-    }
-
-    const handleChangeFormPayment = (event: SelectChangeEvent) => {
-        setSelectedPayment(event.target.value)
-    }
+    useEffect(() => {
+        // const list = listAccessories?.map((item) => {
+        //     item.name
+        // })
+        //setListItem(list)
+    }, [listAccessories])
 
     useEffect(() => {
         if (search) {
@@ -173,20 +196,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         } else {
             setCheck(false)
         }
-    }, [
-        seletedDevice,
-        seletedAccessories,
-        nameClient,
-        value,
-        email,
-        cpf,
-        cep,
-        state,
-        city,
-        neighborhood,
-        street,
-        number,
-    ])
+    }, [seletedDevice, seletedAccessories, nameClient, value, email, cpf, cep, state, city, neighborhood, street, number])
 
     const soldProduct = () => {
         if (selectedClient === undefined) {
@@ -213,7 +223,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     seriesNumber: seletedDevice?.seriesNumber,
                     expense: 0,
                     fees: fees && !isNaN(Number(fees)) ? Number(fees) : 0,
-                    formPayment: selectedPayment,
+                    formPayment: personName,
                     client: cpf,
                     seller: user,
                     gift: gift,
@@ -235,7 +245,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     quantity: quantity,
                     status: seletedAccessories?.status,
                     maxDiscountAmout: seletedAccessories?.maxDiscountAmout,
-                    payment: selectedPayment,
+                    payment: personName,
                     client: seletedClient?.cpf,
                 })
                 .then((res) => {
@@ -265,7 +275,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 number: number,
                 complement: complement,
                 product: seletedDevice?.name,
-                formPayment: selectedPayment,
+                formPayment: personName,
             })
             .catch((err) => console.log(err))
     }
@@ -303,9 +313,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         >
                             {productType === 'Device'
                                 ? listDevice?.map((device: Device) => (
-                                      <MenuItem
-                                          value={device.seriesNumber}
-                                      >{`${device.name} - ${device.seriesNumber}`}</MenuItem>
+                                      <MenuItem value={device.seriesNumber}>{`${device.name} - ${device.seriesNumber}`}</MenuItem>
                                   ))
                                 : listAccessories?.map((accessories: Accessories) => (
                                       <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
@@ -316,16 +324,22 @@ export default function SoldProduct({ productType }: InsertProductProps) {
 
                 <Box sx={{ minWidth: '200px', width: '100%' }}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Forma de pagamento</InputLabel>
+                        <InputLabel id="demo-multiple-checkbox-label">Forma de pagamento</InputLabel>
                         <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={selectedPayment}
-                            label="Forma de pagamento"
-                            onChange={handleChangeFormPayment}
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            multiple
+                            value={personName}
+                            onChange={handleChangePayment}
+                            input={<OutlinedInput label="Forma de pagamento" />}
+                            renderValue={(selected) => selected.join(', ')}
+                            MenuProps={MenuProps}
                         >
-                            {formPayment?.map((item) => (
-                                <MenuItem value={item}>{item}</MenuItem>
+                            {formPayment.map((name) => (
+                                <MenuItem key={name} value={name}>
+                                    <Checkbox checked={personName.indexOf(name) > -1} />
+                                    <ListItemText primary={name} />
+                                </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
@@ -402,13 +416,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     Detalhes do cliente
                 </div>
             </Grid>
-            <Grid
-                item
-                display={'flex'}
-                flexDirection={isMobile ? 'column' : 'row'}
-                gap={'20px'}
-                style={{ width: '100%' }}
-            >
+            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
                 <InputMask
                     mask="999.999.999-99"
                     maskPlaceholder={null}
@@ -441,13 +449,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     }}
                 />
             </Grid>
-            <Grid
-                item
-                display={'flex'}
-                flexDirection={isMobile ? 'column' : 'row'}
-                gap={'20px'}
-                style={{ width: '100%' }}
-            >
+            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
                 <InputMask mask="99/99/9999" maskPlaceholder={null} value={dn} onChange={(e) => setDn(e.target.value)}>
                     <TextField fullWidth label="Data de nascimento" />
                 </InputMask>
@@ -472,13 +474,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     <TextField fullWidth id="outlined-basic" label="CEP" variant="outlined" />
                 </InputMask>
             </Grid>
-            <Grid
-                item
-                display={'flex'}
-                flexDirection={isMobile ? 'column' : 'row'}
-                gap={'20px'}
-                style={{ width: '100%' }}
-            >
+            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
                 <TextField
                     fullWidth
                     id="outlined-basic"
@@ -550,11 +546,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     }}
                 />
             </Grid>
-            <Snackbars
-                message={message}
-                type={message !== 'Aparelho vendido com sucesso!' ? 'error' : 'success'}
-                open={open}
-            />
+            <Snackbars message={message} type={message !== 'Aparelho vendido com sucesso!' ? 'error' : 'success'} open={open} />
             <Grid
                 item
                 display={'flex'}

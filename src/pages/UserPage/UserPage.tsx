@@ -22,7 +22,7 @@ export const User: React.FC = () => {
 
     useEffect(() => {
         if (access) {
-            if (access.length >= 2) {
+            if (access.length >= 2 || access === '2') {
                 navigate('/')
             }
         } else {

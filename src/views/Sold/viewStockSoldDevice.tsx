@@ -13,17 +13,7 @@ import { SoldDevice } from '../../model/SoldDevice'
 import { formatarData } from '../../utils/formatterData'
 
 interface Column {
-    id:
-        | 'name'
-        | 'soldValue'
-        | 'seriesNumber'
-        | 'gift'
-        | 'expenses'
-        | 'fees'
-        | 'formPayment'
-        | 'client'
-        | 'seller'
-        | 'createdAt'
+    id: 'name' | 'soldValue' | 'seriesNumber' | 'gift' | 'expenses' | 'fees' | 'formPayment' | 'client' | 'seller' | 'createdAt'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -167,8 +157,8 @@ export default function ViewStockSoldDevice() {
         const fetchData = async () => {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URI}/sold`)
-                console.log(response.data)
-                const formattedRows = response.data.map((data: SoldDevice) => {
+
+                const formattedRows = response.data.map((data: any) => {
                     return createData(
                         data.name,
                         data.soldValue,
@@ -176,7 +166,7 @@ export default function ViewStockSoldDevice() {
                         data.gift,
                         data.expenses,
                         data.fees,
-                        data.formPayment,
+                        data.formPayment.join(', '),
                         data.client,
                         data.seller,
                         formatarData(data.createdAt)
@@ -226,11 +216,7 @@ export default function ViewStockSoldDevice() {
                                         const value = row[column.id]
                                         return (
                                             <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
-                                                {column.format && typeof value === 'number'
-                                                    ? column.format(value)
-                                                    : value
-                                                    ? value
-                                                    : '-'}
+                                                {column.format && typeof value === 'number' ? column.format(value) : value ? value : '-'}
                                             </TableCell>
                                         )
                                     })}
