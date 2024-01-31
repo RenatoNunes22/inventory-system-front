@@ -43,12 +43,12 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const isMobile = useMedia('(max-width: 1220px)')
     const user = localStorage.getItem('user')?.replace(/"/g, '')
     const [listDevice, setListDevice] = useState<Device[]>()
-    const [listAccessories, setListAccessories] = useState<Accessories[]>()
+    const [listAccessories, setListAccessories] = useState<Array<string>>()
     const [search, setSearch] = useState<number | string>('')
     const [seletedDevice, setSeletedDevice] = useState<Device>()
     const [seletedAccessories, setSeletedAccessories] = useState<Accessories>()
     const [seletedClient, setSeletedClient] = useState<Client>()
-    const [gift, setGift] = useState<string>()
+    const [gift, setGift] = useState<string[]>([])
 
     //CLIENT
     const [selectedClient, setSelectedClient] = useState<Client>()
@@ -82,15 +82,18 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         setSearch(event.target.value)
     }
 
-    const handleChangeGift = (event: SelectChangeEvent) => {
-        setGift(event.target.value)
-    }
-
     const handleChangePayment = (event: SelectChangeEvent<typeof personName>) => {
         const {
             target: { value },
         } = event
         setPersonName(typeof value === 'string' ? value.split(',') : value)
+    }
+
+    const handleChangeGift = (event: SelectChangeEvent<typeof gift>) => {
+        const {
+            target: { value },
+        } = event
+        setGift(typeof value === 'string' ? value.split(',') : value)
     }
 
     useEffect(() => {
@@ -111,9 +114,8 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [cep])
 
     useEffect(() => {
-        const newCPF = cpf.replace(caracteresARemover, '')
-        if (newCPF.length === 11) {
-            axios.get(`${import.meta.env.VITE_API_URI}/clients/${newCPF}`).then((res) => {
+        if (cpf.length === 14) {
+            axios.get(`${import.meta.env.VITE_API_URI}/clients/${cpf}`).then((res) => {
                 setSelectedClient(res.data[0])
                 setNameClient(res.data[0].name)
                 setEmail(res.data[0].email)
@@ -147,16 +149,11 @@ export default function SoldProduct({ productType }: InsertProductProps) {
             axios.get(`${import.meta.env.VITE_API_URI}/accessories/`),
         ]).then((res) => {
             setListDevice(res[0].data)
-            setListAccessories(res[1].data)
+            const listItems = res[1].data.map((item: Accessories) => item.name)
+            console.log(listItems)
+            setListAccessories(listItems)
         })
     }, [productType, open])
-
-    useEffect(() => {
-        // const list = listAccessories?.map((item) => {
-        //     item.name
-        // })
-        //setListItem(list)
-    }, [listAccessories])
 
     useEffect(() => {
         if (search) {
@@ -315,9 +312,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                                 ? listDevice?.map((device: Device) => (
                                       <MenuItem value={device.seriesNumber}>{`${device.name} - ${device.seriesNumber}`}</MenuItem>
                                   ))
-                                : listAccessories?.map((accessories: Accessories) => (
-                                      <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
-                                  ))}
+                                : listAccessories?.map((accessories: string) => <MenuItem value={accessories}>{accessories}</MenuItem>)}
                         </Select>
                     </FormControl>
                 </Box>
@@ -364,16 +359,22 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 {productType === 'Device' ? (
                     <Box sx={{ minWidth: '200px', width: '100%' }}>
                         <FormControl fullWidth>
-                            <InputLabel id="demo-simple-select-label">Selecione um brinde</InputLabel>
+                            <InputLabel id="demo-multiple-checkbox-label">Brindes</InputLabel>
                             <Select
-                                labelId="demo-simple-select-label"
-                                id="demo-simple-select"
-                                value={gift ? gift : undefined}
-                                label="Selecione um brinde"
+                                labelId="demo-multiple-checkbox-label"
+                                id="demo-multiple-checkbox"
+                                multiple
+                                value={gift}
                                 onChange={handleChangeGift}
+                                input={<OutlinedInput label="Brindes" />}
+                                renderValue={(selected) => selected.join(', ')}
+                                MenuProps={MenuProps}
                             >
-                                {listAccessories?.map((accessories: Accessories) => (
-                                    <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
+                                {listAccessories?.map((listAccessories) => (
+                                    <MenuItem key={listAccessories} value={listAccessories}>
+                                        <Checkbox checked={listAccessories.indexOf(listAccessories) > -1} />
+                                        <ListItemText primary={listAccessories} />
+                                    </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
