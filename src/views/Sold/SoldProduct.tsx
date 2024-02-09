@@ -176,24 +176,12 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [productType])
 
     useEffect(() => {
-        if (
-            (seletedDevice || seletedAccessories) &&
-            nameClient &&
-            value &&
-            email &&
-            cpf &&
-            cep &&
-            state &&
-            city &&
-            neighborhood &&
-            street &&
-            number
-        ) {
+        if (seletedDevice || seletedAccessories) {
             setCheck(true)
         } else {
             setCheck(false)
         }
-    }, [seletedDevice, seletedAccessories, nameClient, value, email, cpf, cep, state, city, neighborhood, street, number])
+    }, [seletedDevice, seletedAccessories])
 
     const soldProduct = () => {
         if (selectedClient === undefined) {
@@ -259,7 +247,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const IssueNote = () => {
         axios
             .post(`${import.meta.env.VITE_API_URI}/sendEmail`, {
-                email: email,
+                email: email ? email : 'renatonunes0011@gmail.com',
                 cpf: cpf,
                 name: nameClient,
                 value: value,
@@ -316,7 +304,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         </Select>
                     </FormControl>
                 </Box>
-
                 <Box sx={{ minWidth: '200px', width: '100%' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-multiple-checkbox-label">Forma de pagamento</InputLabel>
@@ -410,143 +397,146 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     )}
                 </FormControl>
             </Grid>
+            {productType === 'Device' && (
+                <>
+                    <Grid container display={'flex'} gap={'20px'} style={{ marginTop: '20px', width: '100%' }}>
+                        <div className="title">
+                            <PeopleAltIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
+                            Detalhes do cliente
+                        </div>
+                    </Grid>
+                    <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
+                        <InputMask
+                            mask="999.999.999-99"
+                            maskPlaceholder={null}
+                            value={cpf}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setCPF(event.target.value)
+                            }}
+                        >
+                            <TextField fullWidth id="outlined-basic" label="CPF" variant="outlined" />
+                        </InputMask>
+                        <TextField
+                            required
+                            fullWidth
+                            id="outlined-basic"
+                            label="Email"
+                            variant="outlined"
+                            value={seletedClient?.email ? seletedClient.email : email}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setEmail(event.target.value)
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            id="outlined-basic"
+                            label="Nome do cliente"
+                            variant="outlined"
+                            value={seletedClient?.name ? seletedClient.name : nameClient}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setNameClient(event.target.value)
+                            }}
+                        />
+                    </Grid>
+                    <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
+                        <InputMask mask="99/99/9999" maskPlaceholder={null} value={dn} onChange={(e) => setDn(e.target.value)}>
+                            <TextField fullWidth label="Data de nascimento" />
+                        </InputMask>
+                        <InputMask
+                            mask="(99)99999-9999"
+                            maskPlaceholder={null}
+                            value={seletedClient?.telephone ? seletedClient.telephone : phone}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setPhone(event.target.value)
+                            }}
+                        >
+                            <TextField fullWidth id="outlined-basic" label="Telefone" variant="outlined" />
+                        </InputMask>
+                        <InputMask
+                            mask="99.999-999"
+                            maskPlaceholder={null}
+                            value={cep}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setCep(event.target.value)
+                            }}
+                        >
+                            <TextField fullWidth id="outlined-basic" label="CEP" variant="outlined" />
+                        </InputMask>
+                    </Grid>
+                    <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
+                        <TextField
+                            fullWidth
+                            id="outlined-basic"
+                            label="Estado"
+                            variant="outlined"
+                            value={state}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setState(event.target.value)
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            id="outlined-basic"
+                            label="Cidade"
+                            variant="outlined"
+                            value={city}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setCity(event.target.value)
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            id="outlined-basic"
+                            label="Bairro"
+                            variant="outlined"
+                            value={neighborhood}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setNeighborhood(event.target.value)
+                            }}
+                        />
+                    </Grid>
+                    <Grid
+                        item
+                        display={'flex'}
+                        flexDirection={isMobile ? 'column' : 'row'}
+                        justifyContent={'start'}
+                        gap={'20px'}
+                        style={{ width: '100%' }}
+                    >
+                        <TextField
+                            fullWidth
+                            id="outlined-basic"
+                            label="Logradouro"
+                            variant="outlined"
+                            value={street}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setStreet(event.target.value)
+                            }}
+                        />
+                        <InputMask
+                            mask="99999"
+                            maskPlaceholder={null}
+                            value={number}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setNumber(event.target.value)
+                            }}
+                        >
+                            <TextField fullWidth label="Número" />
+                        </InputMask>
 
-            <Grid container display={'flex'} gap={'20px'} style={{ marginTop: '20px', width: '100%' }}>
-                <div className="title">
-                    <PeopleAltIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
-                    Detalhes do cliente
-                </div>
-            </Grid>
-            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
-                <InputMask
-                    mask="999.999.999-99"
-                    maskPlaceholder={null}
-                    value={cpf}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setCPF(event.target.value)
-                    }}
-                >
-                    <TextField fullWidth id="outlined-basic" label="CPF" variant="outlined" />
-                </InputMask>
-                <TextField
-                    required
-                    fullWidth
-                    id="outlined-basic"
-                    label="Email"
-                    variant="outlined"
-                    value={seletedClient?.email ? seletedClient.email : email}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setEmail(event.target.value)
-                    }}
-                />
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Nome do cliente"
-                    variant="outlined"
-                    value={seletedClient?.name ? seletedClient.name : nameClient}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setNameClient(event.target.value)
-                    }}
-                />
-            </Grid>
-            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
-                <InputMask mask="99/99/9999" maskPlaceholder={null} value={dn} onChange={(e) => setDn(e.target.value)}>
-                    <TextField fullWidth label="Data de nascimento" />
-                </InputMask>
-                <InputMask
-                    mask="(99)99999-9999"
-                    maskPlaceholder={null}
-                    value={seletedClient?.telephone ? seletedClient.telephone : phone}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setPhone(event.target.value)
-                    }}
-                >
-                    <TextField fullWidth id="outlined-basic" label="Telefone" variant="outlined" />
-                </InputMask>
-                <InputMask
-                    mask="99.999-999"
-                    maskPlaceholder={null}
-                    value={cep}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setCep(event.target.value)
-                    }}
-                >
-                    <TextField fullWidth id="outlined-basic" label="CEP" variant="outlined" />
-                </InputMask>
-            </Grid>
-            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Estado"
-                    variant="outlined"
-                    value={state}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setState(event.target.value)
-                    }}
-                />
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Cidade"
-                    variant="outlined"
-                    value={city}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setCity(event.target.value)
-                    }}
-                />
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Bairro"
-                    variant="outlined"
-                    value={neighborhood}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setNeighborhood(event.target.value)
-                    }}
-                />
-            </Grid>
-            <Grid
-                item
-                display={'flex'}
-                flexDirection={isMobile ? 'column' : 'row'}
-                justifyContent={'start'}
-                gap={'20px'}
-                style={{ width: '100%' }}
-            >
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Logradouro"
-                    variant="outlined"
-                    value={street}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setStreet(event.target.value)
-                    }}
-                />
-                <InputMask
-                    mask="99999"
-                    maskPlaceholder={null}
-                    value={number}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setNumber(event.target.value)
-                    }}
-                >
-                    <TextField fullWidth label="Número" />
-                </InputMask>
-
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Complemento"
-                    variant="outlined"
-                    value={complement}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setComplement(event.target.value)
-                    }}
-                />
-            </Grid>
+                        <TextField
+                            fullWidth
+                            id="outlined-basic"
+                            label="Complemento"
+                            variant="outlined"
+                            value={complement}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setComplement(event.target.value)
+                            }}
+                        />
+                    </Grid>
+                </>
+            )}
             <Snackbars message={message} type={message !== 'Aparelho vendido com sucesso!' ? 'error' : 'success'} open={open} />
             <Grid
                 item
