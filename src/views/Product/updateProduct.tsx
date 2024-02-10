@@ -1,15 +1,5 @@
 import * as React from 'react'
-import {
-    Box,
-    Button,
-    FormControl,
-    Grid,
-    InputLabel,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
-    TextField,
-} from '@mui/material'
+import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import axios from 'axios'
 import { Device } from '../../model/Device'
@@ -64,7 +54,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
     const setDataDevice = (device: Device) => {
         setDevice(device)
         setNewNameProduct(device.name)
-        setNewValueProduct(String(device.value))
+        setNewValueProduct(String(device.inputValue))
         setNewTypeProduct(device.type)
         setNewStatusProduct(device.status)
         setNewMaxDiscountAmoutProduct(String(device.maxDiscountAmout))
@@ -105,7 +95,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
             axios
                 .put(`${import.meta.env.VITE_API_URI}/devices/${device.seriesNumber}`, {
                     name: newNameProduct ? newNameProduct : device.name,
-                    value: newValueProduct ? newValueProduct : device.value,
+                    value: newValueProduct ? newValueProduct : device.inputValue,
                     type: newTypeProduct ? newTypeProduct : device.type,
                     seriesNumber: newSeriesNumberProduct ? newSeriesNumberProduct : device.seriesNumber,
                     status: newStatusProduct ? newStatusProduct : device.status,
@@ -134,9 +124,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                     type: newTypeProduct ? newTypeProduct : accessories.type,
                     quantity: newQuantityProduct ? newQuantityProduct : accessories.quantity,
                     status: newStatusProduct ? newStatusProduct : accessories.status,
-                    maxDiscountAmout: newMaxDiscountAmoutProduct
-                        ? newMaxDiscountAmoutProduct
-                        : accessories.maxDiscountAmout,
+                    maxDiscountAmout: newMaxDiscountAmoutProduct ? newMaxDiscountAmoutProduct : accessories.maxDiscountAmout,
                     createdAt: newCreatedAtProduct ? convertDate(newCreatedAtProduct) : accessories.createdAt,
                 })
                 .then((res) => {
@@ -195,9 +183,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                         >
                             {productType === 'Device'
                                 ? listDevice?.map((device: Device) => (
-                                      <MenuItem
-                                          value={device.seriesNumber}
-                                      >{`${device.name} - ${device.seriesNumber}`}</MenuItem>
+                                      <MenuItem value={device.seriesNumber}>{`${device.name} - ${device.seriesNumber}`}</MenuItem>
                                   ))
                                 : listAccessories?.map((accessories: Accessories) => (
                                       <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
@@ -364,11 +350,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                             }}
                         />
                     </Grid>
-                    <Snackbars
-                        message={message}
-                        type={message !== 'Produto atualizado com sucesso!' ? 'error' : 'success'}
-                        open={open}
-                    />
+                    <Snackbars message={message} type={message !== 'Produto atualizado com sucesso!' ? 'error' : 'success'} open={open} />
                     <Grid item display={'flex'} justifyContent={isMobile ? 'center' : 'end'} width={'100%'}>
                         <Button
                             variant="contained"
