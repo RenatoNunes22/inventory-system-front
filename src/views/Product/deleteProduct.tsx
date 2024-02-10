@@ -1,15 +1,5 @@
 import * as React from 'react'
-import {
-    Box,
-    Button,
-    FormControl,
-    Grid,
-    InputLabel,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
-    TextField,
-} from '@mui/material'
+import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import axios from 'axios'
 import { Device } from '../../model/Device'
@@ -57,9 +47,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
         } else {
             axios
                 .get(`${import.meta.env.VITE_API_URI}/accessories/${search}`)
-                .then((res) =>
-                    productType === 'Device' ? setDataDevice(res.data[0]) : setDataAccessories(res.data[0])
-                )
+                .then((res) => (productType === 'Device' ? setDataDevice(res.data[0]) : setDataAccessories(res.data[0])))
                 .catch((err) => console.log(err))
         }
     }
@@ -99,7 +87,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
     const setDataDevice = (device: Device) => {
         setDevice(device)
         setNewNameProduct(device.name)
-        setNewValueProduct(String(device.value))
+        setNewValueProduct(String(device.inputValue))
         setNewTypeProduct(device.type)
         setNewStatusProduct(device.status)
         setNewMaxDiscountAmoutProduct(String(device.maxDiscountAmout))
@@ -183,9 +171,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                         >
                             {productType === 'Device'
                                 ? listDevice?.map((device: Device) => (
-                                      <MenuItem
-                                          value={device.seriesNumber}
-                                      >{`${device.name} - ${device.seriesNumber}`}</MenuItem>
+                                      <MenuItem value={device.seriesNumber}>{`${device.name} - ${device.seriesNumber}`}</MenuItem>
                                   ))
                                 : listAccessories?.map((accessories: Accessories) => (
                                       <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
@@ -360,11 +346,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                             }}
                         />
                     </Grid>
-                    <Snackbars
-                        message={message}
-                        type={message !== 'Produto deletado com sucesso!' ? 'error' : 'success'}
-                        open={open}
-                    />
+                    <Snackbars message={message} type={message !== 'Produto deletado com sucesso!' ? 'error' : 'success'} open={open} />
                     <Grid item display={'flex'} justifyContent={isMobile ? 'center' : 'end'} width={'100%'}>
                         <Button
                             variant="contained"
