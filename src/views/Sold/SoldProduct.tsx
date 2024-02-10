@@ -49,6 +49,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const [seletedAccessories, setSeletedAccessories] = useState<Accessories>()
     const [seletedClient, setSeletedClient] = useState<Client>()
     const [gift, setGift] = useState<string[]>([])
+    const [minValue, setMinValue] = useState<number>()
 
     //CLIENT
     const [selectedClient, setSelectedClient] = useState<Client>()
@@ -95,6 +96,14 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         } = event
         setGift(typeof value === 'string' ? value.split(',') : value)
     }
+
+    useEffect(() => {
+        if (seletedDevice) {
+            setMinValue(seletedDevice?.outputValue - seletedDevice?.maxDiscountAmout)
+        } else if (seletedAccessories) {
+            setMinValue(seletedAccessories?.value - seletedAccessories?.maxDiscountAmout)
+        }
+    }, [seletedDevice, seletedAccessories])
 
     useEffect(() => {
         const newCEP = cep.replace(caracteresARemover, '')
@@ -150,7 +159,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         ]).then((res) => {
             setListDevice(res[0].data)
             const listItems = res[1].data.map((item: Accessories) => item.name)
-            console.log(listItems)
             setListAccessories(listItems)
         })
     }, [productType, open])
@@ -204,9 +212,9 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         if (productType === 'Device') {
             axios
                 .post(`${import.meta.env.VITE_API_URI}/deviceSold/${search}`, {
-                    soldValue: Number(value),
+                    soldValue: Number(value.replace('R$: ', '')),
                     seriesNumber: seletedDevice?.seriesNumber,
-                    expense: 0,
+                    expenses: 0,
                     fees: fees && !isNaN(Number(fees)) ? Number(fees) : 0,
                     formPayment: personName,
                     client: cpf,
@@ -225,7 +233,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
             axios
                 .post(`${import.meta.env.VITE_API_URI}/sold`, {
                     name: seletedAccessories?.name,
-                    value: value,
+                    value: Number(value.replace('R$: ', '')),
                     type: seletedAccessories?.type,
                     quantity: quantity,
                     status: seletedAccessories?.status,
@@ -250,7 +258,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 email: email ? email : 'renatonunes0011@gmail.com',
                 cpf: cpf,
                 name: nameClient,
-                value: value,
+                value: value.replace('R$: ', ''),
                 phone: phone,
                 cep: cep,
                 state: state,
@@ -359,7 +367,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                             >
                                 {listAccessories?.map((listAccessories) => (
                                     <MenuItem key={listAccessories} value={listAccessories}>
-                                        <Checkbox checked={listAccessories.indexOf(listAccessories) > -1} />
+                                        <Checkbox checked={gift.indexOf(listAccessories) > -1} />
                                         <ListItemText primary={listAccessories} />
                                     </MenuItem>
                                 ))}
@@ -378,24 +386,27 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         }}
                     />
                 )}
-
-                <FormControl fullWidth>
-                    <InputLabel htmlFor="outlined-adornment-amount">Valor do produto</InputLabel>
-                    <OutlinedInput
-                        id="outlined-adornment-amount"
-                        error={value && isNaN(Number(value)) ? true : false}
-                        startAdornment={value !== '' ? <InputAdornment position="start">R$</InputAdornment> : null}
-                        label="Valor do produto"
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            setValue(event.target.value)
-                        }}
-                    />
-                    {value && isNaN(Number(value)) && (
-                        <FormHelperText error id="accountId-error">
-                            Apenas números
-                        </FormHelperText>
-                    )}
-                </FormControl>
+                <InputMask
+                    mask="R$: 99999"
+                    maskPlaceholder={null}
+                    value={value}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setValue(event.target.value)
+                    }}
+                    onBlur={() => {
+                        console.log(minValue)
+                        if (Number(value.replace('R$: ', '')) < minValue!) {
+                            setValue('')
+                            setOpen(true)
+                            setMessage(`Valor do produto é no mínimo R$${minValue} !`)
+                            setTimeout(() => {
+                                setOpen(false)
+                            }, 2000)
+                        }
+                    }}
+                >
+                    <TextField fullWidth id="outlined-basic" label="Valor do produto" variant="outlined" />
+                </InputMask>
             </Grid>
             {productType === 'Device' && (
                 <>

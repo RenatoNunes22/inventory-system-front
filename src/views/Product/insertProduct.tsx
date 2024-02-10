@@ -16,6 +16,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
     const [open, setOpen] = useState(false)
     const [nameDevice, setNameDevice] = useState('')
     const [value, setValue] = useState('')
+    const [outputValue, setOutputValue] = useState('')
     const [type, setType] = useState('')
     const [seriesNumber, setSeriesNumber] = useState<string>('')
     const [status, setStatus] = useState('')
@@ -29,12 +30,13 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                 axios
                     .post(`${import.meta.env.VITE_API_URI}/device`, {
                         name: nameDevice,
-                        value: value,
+                        inputValue: Number(value.replace('R$: ', '')),
+                        outputValue: Number(outputValue.replace('R$: ', '')),
                         type: type,
                         seriesNumber: seriesNumber,
                         status: status,
                         stateBattery: stateBattery,
-                        maxDiscountAmout: maxDiscountAmout,
+                        maxDiscountAmout: maxDiscountAmout.replace('R$: ', ''),
                     })
                     .then((res) => {
                         setMessage(res.data)
@@ -48,11 +50,12 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                 axios
                     .post(`${import.meta.env.VITE_API_URI}/accessories`, {
                         name: nameDevice,
-                        value: value,
+                        inputValue: Number(value.replace('R$: ', '')),
+                        outputValue: Number(outputValue.replace('R$: ', '')),
                         type: type,
                         quantity: quantity,
                         status: status,
-                        maxDiscountAmout: maxDiscountAmout,
+                        maxDiscountAmout: maxDiscountAmout ? maxDiscountAmout : 0,
                     })
                     .then((res) => {
                         setMessage(res.data)
@@ -67,22 +70,14 @@ export default function InsertProduct({ productType }: InsertProductProps) {
     }
 
     useEffect(() => {
-        if (
-            productType === 'Device' &&
-            nameDevice &&
-            value &&
-            type &&
-            seriesNumber &&
-            stateBattery &&
-            maxDiscountAmout
-        ) {
+        if (productType === 'Device' && nameDevice && value && type && seriesNumber && stateBattery) {
             setCheck(true)
-        } else if (productType === 'Accessories' && nameDevice && value && type && quantity && maxDiscountAmout) {
+        } else if (productType === 'Accessories' && nameDevice && value && type && quantity) {
             setCheck(true)
         } else {
             setCheck(false)
         }
-    }, [maxDiscountAmout, nameDevice, seriesNumber, stateBattery, type, value])
+    }, [nameDevice, seriesNumber, stateBattery, type, value, quantity])
 
     return (
         <>
@@ -112,28 +107,31 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         setValue(event.target.value)
                     }}
                 >
-                    <TextField fullWidth id="outlined-basic" label="Valor do produto" variant="outlined" />
+                    <TextField fullWidth id="outlined-basic" label="Valor de entrada" variant="outlined" />
                 </InputMask>
-
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Tipo do aparelho"
-                    variant="outlined"
-                    value={type}
+                <InputMask
+                    mask="R$: 999999"
+                    maskPlaceholder={null}
+                    value={outputValue}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setType(event.target.value)
+                        setOutputValue(event.target.value)
                     }}
-                />
+                    onBlur={() => {
+                        if (Number(outputValue.replace('R$: ', '')) < Number(value.replace('R$: ', ''))) {
+                            setMessage('Valor de saída deve ser maior que o valor de entrada!')
+                            setOpen(true)
+                            setOutputValue('')
+                            setTimeout(() => {
+                                setOpen(false)
+                            }, 2000)
+                        }
+                    }}
+                >
+                    <TextField fullWidth id="outlined-basic" label="Valor de saída" variant="outlined" />
+                </InputMask>
             </Grid>
 
-            <Grid
-                item
-                display={'flex'}
-                flexDirection={isMobile ? 'column' : 'row'}
-                gap={'20px'}
-                style={{ width: '100%' }}
-            >
+            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
                 {productType === 'Device' ? (
                     <>
                         <InputMask
@@ -160,7 +158,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                                 }}
                                 fullWidth
                                 id="outlined-basic"
-                                label="Estado da bateria"
+                                label="Saúde da bateria"
                                 variant="outlined"
                             />
                         </InputMask>
@@ -177,40 +175,40 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
                     </InputMask>
                 )}
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Tipo do aparelho"
+                    variant="outlined"
+                    value={type}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setType(event.target.value)
+                    }}
+                />
+            </Grid>
+            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
                 <InputMask
-                    mask="99"
+                    mask="R$: 99999"
                     maskPlaceholder={null}
                     value={maxDiscountAmout}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setMaxDiscountAmout(event.target.value)
                     }}
                 >
-                    <TextField
-                        InputProps={{
-                            endAdornment: <InputAdornment position="start">%</InputAdornment>,
-                        }}
-                        fullWidth
-                        id="outlined-basic"
-                        label="Desconto máximo"
-                        variant="outlined"
-                    />
+                    <TextField fullWidth id="outlined-basic" label="Desconto máximo" variant="outlined" />
                 </InputMask>
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Status"
+                    variant="outlined"
+                    value={status}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setStatus(event.target.value)
+                    }}
+                />
             </Grid>
-            <TextField
-                fullWidth
-                id="outlined-basic"
-                label="Status"
-                variant="outlined"
-                value={status}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setStatus(event.target.value)
-                }}
-            />
-            <Snackbars
-                message={message}
-                type={message !== 'Produto inserido com sucesso!' ? 'error' : 'success'}
-                open={open}
-            />
+            <Snackbars message={message} type={message !== 'Produto inserido com sucesso!' ? 'error' : 'success'} open={open} />
             <Button
                 variant="contained"
                 sx={{

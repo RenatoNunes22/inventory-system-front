@@ -124,7 +124,6 @@ export default function ViewStockAccesories() {
                 setRows(formattedRows)
             } catch (error) {
                 console.error('Error fetching data:', error)
-                // Trate o erro conforme necessário
             }
         }
 
@@ -170,9 +169,7 @@ export default function ViewStockAccesories() {
                                         const value = row[column.id]
                                         return (
                                             <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
-                                                {column.format && typeof value === 'number'
-                                                    ? column.format(value)
-                                                    : value}
+                                                {column.format && typeof value === 'number' ? column.format(value) : value}
                                             </TableCell>
                                         )
                                     })}

@@ -12,7 +12,7 @@ import { Device } from '../../model/Device'
 import { formatarData } from '../../utils/formatterData'
 
 interface Column {
-    id: 'name' | 'value' | 'type' | 'seriesNumber' | 'stateBattery' | 'maxDiscountAmout' | 'createdAt' | 'status'
+    id: 'name' | 'inputValue' | 'outputValue' | 'type' | 'seriesNumber' | 'stateBattery' | 'maxDiscountAmout' | 'createdAt' | 'status'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -21,7 +21,8 @@ interface Column {
 
 const columns: readonly Column[] = [
     { id: 'name', label: 'Nome do aparelho', minWidth: 170, align: 'center' },
-    { id: 'value', label: 'Valor do aparelho', minWidth: 170, align: 'center' },
+    { id: 'inputValue', label: 'Valor de entrada', minWidth: 170, align: 'center' },
+    { id: 'outputValue', label: 'Valor de saída', minWidth: 170, align: 'center' },
     {
         id: 'type',
         label: 'Tipo de aparelho',
@@ -66,30 +67,21 @@ const columns: readonly Column[] = [
     },
 ]
 
-interface Data {
-    name: string
-    value: number
-    type: string
-    seriesNumber: string
-    stateBattery: number
-    maxDiscountAmout: number
-    createdAt: string
-    status: string
-}
-
 function createData(
     name: string,
-    value: number,
+    inputValue: number,
+    outputValue: number,
     type: string,
     seriesNumber: string,
     stateBattery: number,
     maxDiscountAmout: number,
     createdAt: string,
     status: string
-): Data {
+): Device {
     return {
         name,
-        value,
+        inputValue,
+        outputValue,
         type,
         seriesNumber,
         stateBattery,
@@ -130,7 +122,8 @@ export default function ViewStockDevice() {
     const [rows, setRows] = React.useState<Array<Device>>([
         {
             name: '',
-            value: 0,
+            inputValue: 0,
+            outputValue: 0,
             type: '',
             seriesNumber: '',
             status: '',
@@ -152,7 +145,8 @@ export default function ViewStockDevice() {
                 const formattedRows = response.data.map((data: Device) => {
                     return createData(
                         data.name,
-                        data.value,
+                        data.inputValue,
+                        data.outputValue,
                         data.type,
                         data.seriesNumber,
                         data.stateBattery,
@@ -205,12 +199,13 @@ export default function ViewStockDevice() {
                                 <TableRow hover role="checkbox" tabIndex={-1} key={row.seriesNumber}>
                                     {columns.map((column) => {
                                         const value = row[column.id]
-                                        console.log(column.id)
                                         return (
                                             <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
                                                 {column.format && typeof value === 'number'
                                                     ? column.format(value)
-                                                    : column.id === 'value'
+                                                    : column.id === 'inputValue'
+                                                    ? `R$${value}`
+                                                    : column.id === 'outputValue'
                                                     ? `R$${value}`
                                                     : column.id === 'stateBattery'
                                                     ? `${value}%`
