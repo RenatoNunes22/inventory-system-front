@@ -76,7 +76,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const [personName, setPersonName] = useState<string[]>([])
     const [value, setValue] = useState('')
     const [check, setCheck] = useState<boolean>(false)
-    const formPayment = ['Dinheiro', 'Cartão de crédito', 'Cartão de débito', 'Pix', 'Boleto']
+    const formPayment = ['Dinheiro', 'Cartão de crédito', 'Cartão de débito', 'Pix', 'Boleto', 'Aparelho na troca']
     const caracteresARemover = /[.\-_]/g
 
     const handleChange = (event: SelectChangeEvent) => {
@@ -98,12 +98,14 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }
 
     useEffect(() => {
-        if (seletedDevice) {
+        if (productType === 'Device' && seletedDevice) {
             setMinValue(seletedDevice?.outputValue - seletedDevice?.maxDiscountAmout)
-        } else if (seletedAccessories) {
-            setMinValue(seletedAccessories?.value - seletedAccessories?.maxDiscountAmout)
+        } else if (productType === 'Accessories' && seletedAccessories) {
+            setMinValue((seletedAccessories?.outputValue - seletedAccessories?.maxDiscountAmout) * Number(quantity))
         }
-    }, [seletedDevice, seletedAccessories])
+    }, [seletedDevice, seletedAccessories, quantity, productType])
+
+    console.log('seletedDevice', seletedAccessories)
 
     useEffect(() => {
         const newCEP = cep.replace(caracteresARemover, '')
@@ -192,7 +194,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [seletedDevice, seletedAccessories])
 
     const soldProduct = () => {
-        if (selectedClient === undefined) {
+        if (selectedClient === undefined || productType === 'Device') {
             axios.post(`${import.meta.env.VITE_API_URI}/clients`, {
                 email: email,
                 cpf: cpf,
@@ -226,28 +228,32 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     setOpen(true)
                     setTimeout(() => {
                         setOpen(false)
-                        window.location.reload()
-                    }, 2000)
+                        if (message === 'Aparelho vendido com sucesso!') {
+                            window.location.reload()
+                        }
+                    }, 1500)
                 })
         } else if (productType === 'Accessories') {
             axios
-                .post(`${import.meta.env.VITE_API_URI}/sold`, {
+                .post(`${import.meta.env.VITE_API_URI}/accessoriesSold`, {
                     name: seletedAccessories?.name,
                     value: Number(value.replace('R$: ', '')),
                     type: seletedAccessories?.type,
-                    quantity: quantity,
+                    formPayment: personName,
+                    quantity: Number(quantity),
                     status: seletedAccessories?.status,
                     maxDiscountAmout: seletedAccessories?.maxDiscountAmout,
                     payment: personName,
-                    client: seletedClient?.cpf,
                 })
                 .then((res) => {
                     setMessage(res.data)
                     setOpen(true)
                     setTimeout(() => {
                         setOpen(false)
-                        window.location.reload()
-                    }, 2000)
+                        if (message === 'Acessório vendido com sucesso!') {
+                            window.location.reload()
+                        }
+                    }, 1000)
                 })
         }
     }
@@ -274,8 +280,12 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }
 
     const makeSale = () => {
-        IssueNote()
-        soldProduct()
+        if (productType === 'Device') {
+            soldProduct()
+            IssueNote()
+        } else if (productType === 'Accessories') {
+            soldProduct()
+        }
     }
 
     return (
@@ -375,16 +385,16 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         </FormControl>
                     </Box>
                 ) : (
-                    <TextField
-                        fullWidth
-                        id="outlined-basic"
-                        label="Quantidade"
-                        variant="outlined"
+                    <InputMask
+                        mask="9999"
+                        maskPlaceholder={null}
                         value={quantity ? quantity : undefined}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setQuantity(event.target.value)
                         }}
-                    />
+                    >
+                        <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
+                    </InputMask>
                 )}
                 <InputMask
                     mask="R$: 99999"
@@ -394,7 +404,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         setValue(event.target.value)
                     }}
                     onBlur={() => {
-                        console.log(minValue)
                         if (Number(value.replace('R$: ', '')) < minValue!) {
                             setValue('')
                             setOpen(true)
@@ -548,7 +557,12 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     </Grid>
                 </>
             )}
-            <Snackbars message={message} type={message !== 'Aparelho vendido com sucesso!' ? 'error' : 'success'} open={open} />
+            <Snackbars
+                message={message}
+                // eslint-disable-next-line no-constant-condition
+                type={message !== 'Aparelho vendido com sucesso!' || 'Acessório vendido com sucesso!' ? 'error' : 'success'}
+                open={open}
+            />
             <Grid
                 item
                 display={'flex'}

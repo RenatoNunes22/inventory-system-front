@@ -36,7 +36,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         seriesNumber: seriesNumber,
                         status: status,
                         stateBattery: stateBattery,
-                        maxDiscountAmout: maxDiscountAmout.replace('R$: ', ''),
+                        maxDiscountAmout: maxDiscountAmout ? Number(maxDiscountAmout.replace('R$: ', '')) : 0,
                     })
                     .then((res) => {
                         setMessage(res.data)
@@ -53,9 +53,9 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         inputValue: Number(value.replace('R$: ', '')),
                         outputValue: Number(outputValue.replace('R$: ', '')),
                         type: type,
-                        quantity: quantity,
+                        quantity: Number(quantity),
                         status: status,
-                        maxDiscountAmout: maxDiscountAmout ? maxDiscountAmout : 0,
+                        maxDiscountAmout: maxDiscountAmout ? Number(maxDiscountAmout.replace('R$: ', '')) : 0,
                     })
                     .then((res) => {
                         setMessage(res.data)

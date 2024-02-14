@@ -29,16 +29,7 @@ export const Sold: React.FC = () => {
         setProductType((event.target as HTMLInputElement).value)
     }
     return (
-        <Grid
-            container={true}
-            display={'flex'}
-            direction={'row'}
-            alignItems={'center'}
-            justifyContent={'start'}
-            xs={12}
-            lg={12}
-            xl={12}
-        >
+        <Grid container={true} display={'flex'} direction={'row'} alignItems={'center'} justifyContent={'start'} xs={12} lg={12} xl={12}>
             <Grid
                 container={true}
                 display={'flex'}
@@ -155,11 +146,7 @@ export const Sold: React.FC = () => {
                                     onChange={handleChange}
                                 >
                                     <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                        <FormControlLabel
-                                            value="Device"
-                                            control={<Radio defaultChecked={true} />}
-                                            label="Aparelhos"
-                                        />
+                                        <FormControlLabel value="Device" control={<Radio defaultChecked={true} />} label="Aparelhos" />
                                         <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
                                     </div>
                                 </RadioGroup>

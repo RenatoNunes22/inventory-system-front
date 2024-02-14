@@ -66,7 +66,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
     const setDataAccessories = (accessories: Accessories) => {
         setAccessories(accessories)
         setNewNameProduct(accessories.name)
-        setNewValueProduct(String(accessories.value))
+        setNewValueProduct(String(accessories.inputValue))
         setNewTypeProduct(accessories.type)
         setNewStatusProduct(accessories.status)
         setNewMaxDiscountAmoutProduct(String(accessories.maxDiscountAmout))
@@ -120,7 +120,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
             axios
                 .put(`${import.meta.env.VITE_API_URI}/accessories/${accessories?.name}`, {
                     name: newNameProduct ? newNameProduct : accessories.name,
-                    value: newValueProduct ? newValueProduct : accessories.value,
+                    value: newValueProduct ? newValueProduct : accessories.inputValue,
                     type: newTypeProduct ? newTypeProduct : accessories.type,
                     quantity: newQuantityProduct ? newQuantityProduct : accessories.quantity,
                     status: newStatusProduct ? newStatusProduct : accessories.status,

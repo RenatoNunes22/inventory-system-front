@@ -99,7 +99,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
     const setDataAccessories = (accessories: Accessories) => {
         setAccessories(accessories)
         setNewNameProduct(accessories.name)
-        setNewValueProduct(String(accessories.value))
+        setNewValueProduct(String(accessories.inputValue))
         setNewTypeProduct(accessories.type)
         setNewStatusProduct(accessories.status)
         setNewMaxDiscountAmoutProduct(String(accessories.maxDiscountAmout))
