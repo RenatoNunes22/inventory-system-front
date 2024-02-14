@@ -12,7 +12,7 @@ import { formatarData } from '../../utils/formatterData'
 import { Accessories } from '../../model/Accessories'
 
 interface Column {
-    id: 'name' | 'value' | 'type' | 'quantity' | 'maxDiscountAmout' | 'createdAt' | 'status'
+    id: 'name' | 'inputValue' | 'type' | 'quantity' | 'maxDiscountAmout' | 'createdAt' | 'status'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -21,7 +21,7 @@ interface Column {
 
 const columns: readonly Column[] = [
     { id: 'name', label: 'Nome do aparelho', minWidth: 170, align: 'center' },
-    { id: 'value', label: 'Valor do aparelho', minWidth: 170, align: 'center' },
+    { id: 'inputValue', label: 'Valor do aparelho', minWidth: 170, align: 'center' },
     {
         id: 'type',
         label: 'Tipo de aparelho',
@@ -95,7 +95,8 @@ export default function ViewStockAccesories() {
     const [rows, setRows] = React.useState<Array<Accessories>>([
         {
             name: '',
-            value: 0,
+            inputValue: 0,
+            outputValue: 0,
             type: '',
             quantity: 0,
             status: '',
@@ -112,7 +113,7 @@ export default function ViewStockAccesories() {
                 const formattedRows = response.data.map((data: Accessories) => {
                     return createData(
                         data.name,
-                        data.value,
+                        data.inputValue,
                         data.type,
                         data.quantity,
                         data.maxDiscountAmout,
