@@ -272,7 +272,7 @@ export default function ViewStockSoldDevice() {
             >
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer components={['DatePicker']}>
-                        <DatePicker format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
+                        <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
                     </DemoContainer>
                 </LocalizationProvider>
                 <Button
