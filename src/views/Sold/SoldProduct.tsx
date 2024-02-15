@@ -238,7 +238,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
             axios
                 .post(`${import.meta.env.VITE_API_URI}/accessoriesSold`, {
                     name: seletedAccessories?.name,
-                    value: Number(value.replace('R$: ', '')),
+                    soldValue: Number(value.replace('R$: ', '')),
                     type: seletedAccessories?.type,
                     formPayment: personName,
                     quantity: Number(quantity),
