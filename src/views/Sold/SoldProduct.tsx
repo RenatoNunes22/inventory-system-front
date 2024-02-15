@@ -228,7 +228,8 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     setOpen(true)
                     setTimeout(() => {
                         setOpen(false)
-                        if (message === 'Aparelho vendido com sucesso!') {
+                        console.log(res.data)
+                        if (res.data === 'Aparelho vendido com sucesso!') {
                             window.location.reload()
                         }
                     }, 1500)
@@ -255,6 +256,14 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         }
                     }, 1000)
                 })
+        }
+    }
+
+    const checkMessage = () => {
+        if (message === 'Aparelho vendido com sucesso!' || message === 'Acessório vendido com sucesso!') {
+            return true
+        } else {
+            return false
         }
     }
 
@@ -557,12 +566,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     </Grid>
                 </>
             )}
-            <Snackbars
-                message={message}
-                // eslint-disable-next-line no-constant-condition
-                type={message !== 'Aparelho vendido com sucesso!' || 'Acessório vendido com sucesso!' ? 'error' : 'success'}
-                open={open}
-            />
+            <Snackbars message={message} type={checkMessage() ? 'success' : 'error'} open={open} />
             <Grid
                 item
                 display={'flex'}
