@@ -21,7 +21,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import dayjs, { Dayjs } from 'dayjs'
 
 interface Column {
-    id: 'name' | 'soldValue' | 'seriesNumber' | 'gift' | 'expenses' | 'fees' | 'formPayment' | 'client' | 'seller' | 'createdAt'
+    id: 'name' | 'soldValue' | 'seriesNumber' | 'gift' | 'expenses' | 'fees' | 'formPayment' | 'client' | 'seller' | 'soldAt'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -86,7 +86,7 @@ const columns: readonly Column[] = [
         format: (value: number) => value.toFixed(2),
     },
     {
-        id: 'createdAt',
+        id: 'soldAt',
         label: 'Data da venda',
         minWidth: 170,
         align: 'center',
@@ -104,7 +104,7 @@ function createData(
     formPayment: string,
     client: string,
     seller: string,
-    createdAt: string
+    soldAt: string
 ): SoldDevice {
     return {
         name,
@@ -116,7 +116,7 @@ function createData(
         formPayment,
         client,
         seller,
-        createdAt,
+        soldAt,
     }
 }
 
@@ -139,7 +139,7 @@ function createData(
 //                 data.seriesNumber,
 //                 data.stateBattery,
 //                 data.maxDiscountAmout,
-//                 formatarData(data.createdAt),
+//                 formatarData(data.soldAt),
 //                 data.status
 //             )
 //         )
@@ -200,7 +200,7 @@ export default function ViewStockSoldDevice() {
                             data.formPayment.join(', '),
                             data.client,
                             data.seller,
-                            formatarData(data.createdAt)
+                            formatarData(data.soldAt)
                         )
                     })
 
@@ -246,7 +246,7 @@ export default function ViewStockSoldDevice() {
                         data.formPayment.join(', '),
                         data.client,
                         data.seller,
-                        formatarData(data.createdAt)
+                        formatarData(data.soldAt)
                     )
                 })
 

@@ -8,5 +8,5 @@ export interface SoldDevice {
     formPayment: string
     client: string
     seller: string
-    createdAt: string
+    soldAt: string
 }

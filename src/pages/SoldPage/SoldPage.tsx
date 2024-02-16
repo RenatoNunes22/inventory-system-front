@@ -127,31 +127,32 @@ export const Sold: React.FC = () => {
                                 boxShadow: '5px 5px 30px 0px rgba(0, 0, 0, 0.30)',
                             }}
                         >
-                            <FormControl
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <FormLabel color="primary" id="demo-row-radio-buttons-group-label">
-                                    Selecione o tipo do produto
-                                </FormLabel>
-                                <RadioGroup
-                                    row
-                                    aria-labelledby="demo-row-radio-buttons-group-label"
-                                    name="row-radio-buttons-group"
-                                    value={productType}
-                                    onChange={handleChange}
+                            {controlButton === 'sold' && (
+                                <FormControl
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
                                 >
-                                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                        <FormControlLabel value="Device" control={<Radio defaultChecked={true} />} label="Aparelhos" />
-                                        <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
-                                    </div>
-                                </RadioGroup>
-                            </FormControl>
-
+                                    <FormLabel color="primary" id="demo-row-radio-buttons-group-label">
+                                        Selecione o tipo do produto
+                                    </FormLabel>
+                                    <RadioGroup
+                                        row
+                                        aria-labelledby="demo-row-radio-buttons-group-label"
+                                        name="row-radio-buttons-group"
+                                        value={productType}
+                                        onChange={handleChange}
+                                    >
+                                        <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                            <FormControlLabel value="Device" control={<Radio defaultChecked={true} />} label="Aparelhos" />
+                                            <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
+                                        </div>
+                                    </RadioGroup>
+                                </FormControl>
+                            )}
                             {controlButton === 'sold' ? (
                                 <div className="title">
                                     <ShoppingCartRoundedIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
