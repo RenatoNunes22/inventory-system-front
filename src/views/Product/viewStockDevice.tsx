@@ -10,6 +10,13 @@ import TableRow from '@mui/material/TableRow'
 import axios from 'axios'
 import { Device } from '../../model/Device'
 import { formatarData } from '../../utils/formatterData'
+import { Button, Grid, TextField } from '@mui/material'
+import InputMask from 'react-input-mask'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
+import { Dayjs } from 'dayjs'
+import SearchIcon from '@mui/icons-material/Search'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 interface Column {
     id: 'name' | 'inputValue' | 'outputValue' | 'type' | 'seriesNumber' | 'stateBattery' | 'maxDiscountAmout' | 'createdAt' | 'status'
@@ -119,6 +126,9 @@ function createData(
 export default function ViewStockDevice() {
     const [page, setPage] = React.useState(0)
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
+    const [search, setSearch] = React.useState('')
+    const [date, setDate] = React.useState<Dayjs | null>(null)
+    const [seriesNumber, setSeriesNumber] = React.useState('')
     const [rows, setRows] = React.useState<Array<Device>>([
         {
             name: '',
@@ -172,62 +182,116 @@ export default function ViewStockDevice() {
     }
 
     return (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <TableContainer sx={{ maxHeight: 440 }}>
-                <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((column) => (
-                                <TableCell
-                                    key={column.id}
-                                    align={column.align}
-                                    style={{ minWidth: column.minWidth }}
-                                    sx={{
-                                        backgroundColor: '#e0e0e0',
-                                        color: '#000',
-                                        fontSize: 18,
-                                    }}
-                                >
-                                    {column.label}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: Device) => {
-                            return (
-                                <TableRow hover role="checkbox" tabIndex={-1} key={row.seriesNumber}>
-                                    {columns.map((column) => {
-                                        const value = row[column.id]
-                                        return (
-                                            <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
-                                                {column.format && typeof value === 'number'
-                                                    ? column.format(value)
-                                                    : column.id === 'inputValue'
-                                                    ? `R$${value}`
-                                                    : column.id === 'outputValue'
-                                                    ? `R$${value}`
-                                                    : column.id === 'stateBattery'
-                                                    ? `${value}%`
-                                                    : value}
-                                            </TableCell>
-                                        )
-                                    })}
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
-                component="div"
-                count={rows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={() => handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-        </Paper>
+        <>
+            <Grid
+                container={true}
+                display={'flex'}
+                direction={'row'}
+                alignItems={'end'}
+                justifyContent={'start'}
+                xs={12}
+                lg={12}
+                xl={12}
+                gap={1}
+            >
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label="Nome do produto"
+                    variant="outlined"
+                    value={search}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setSearch(event.target.value)
+                    }}
+                    sx={{ width: '20%' }}
+                />
+                <InputMask
+                    mask="9999999999"
+                    maskPlaceholder={null}
+                    value={seriesNumber}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setSeriesNumber(event.target.value)
+                    }}
+                >
+                    <TextField fullWidth id="outlined-basic" label="Número de série" variant="outlined" sx={{ width: '20%' }} />
+                </InputMask>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DatePicker']}>
+                        <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
+                    </DemoContainer>
+                </LocalizationProvider>
+                <Button
+                    onClick={() => null}
+                    sx={{
+                        backgroundColor: '#01153a',
+                        color: '#fff',
+                        height: '56px',
+                        px: '15px',
+                        ':hover': { backgroundColor: '#010101' },
+                        gap: '5px',
+                    }}
+                >
+                    <SearchIcon />
+                    BUSCAR
+                </Button>
+            </Grid>
+            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+                <TableContainer sx={{ maxHeight: 440 }}>
+                    <Table stickyHeader aria-label="sticky table">
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((column) => (
+                                    <TableCell
+                                        key={column.id}
+                                        align={column.align}
+                                        style={{ minWidth: column.minWidth }}
+                                        sx={{
+                                            backgroundColor: '#e0e0e0',
+                                            color: '#000',
+                                            fontSize: 18,
+                                        }}
+                                    >
+                                        {column.label}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: Device) => {
+                                return (
+                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.seriesNumber}>
+                                        {columns.map((column) => {
+                                            const value = row[column.id]
+                                            return (
+                                                <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
+                                                    {column.format && typeof value === 'number'
+                                                        ? column.format(value)
+                                                        : column.id === 'inputValue'
+                                                        ? `R$${value}`
+                                                        : column.id === 'outputValue'
+                                                        ? `R$${value}`
+                                                        : column.id === 'stateBattery'
+                                                        ? `${value}%`
+                                                        : value}
+                                                </TableCell>
+                                            )
+                                        })}
+                                    </TableRow>
+                                )
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[10, 25, 100]}
+                    component="div"
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={() => handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            </Paper>
+        </>
     )
 }
