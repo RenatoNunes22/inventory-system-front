@@ -17,6 +17,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
 import { Dayjs } from 'dayjs'
 import SearchIcon from '@mui/icons-material/Search'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 interface Column {
     id: 'name' | 'inputValue' | 'outputValue' | 'type' | 'seriesNumber' | 'stateBattery' | 'maxDiscountAmout' | 'createdAt' | 'status'
@@ -125,6 +126,7 @@ function createData(
 
 export default function ViewStockDevice() {
     const [page, setPage] = React.useState(0)
+    const [dispach, setDispach] = React.useState(true)
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
     const [search, setSearch] = React.useState('')
     const [date, setDate] = React.useState<Dayjs | null>(null)
@@ -174,11 +176,45 @@ export default function ViewStockDevice() {
         }
 
         fetchData()
-    }, [])
+    }, [dispach])
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(+event.target.value)
         setPage(0)
+    }
+
+    const handleFilterDevices = async () => {
+        try {
+            if (!search || !date || !seriesNumber) {
+                const response = await axios.get(`${import.meta.env.VITE_API_URI}/filterDevice/data`, {
+                    params: {
+                        name: search ? search : undefined,
+                        date: date ? date?.format('YYYY-MM-DD') : undefined,
+                        numberSeries: seriesNumber ? seriesNumber : undefined,
+                    },
+                })
+
+                console.log(response.data)
+
+                const formattedRows = response.data.map((data: Device) => {
+                    return createData(
+                        data.name,
+                        data.inputValue,
+                        data.outputValue,
+                        data.type,
+                        data.seriesNumber,
+                        data.stateBattery,
+                        data.maxDiscountAmout,
+                        formatarData(data.createdAt),
+                        data.status
+                    )
+                })
+
+                setRows(formattedRows)
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error)
+        }
     }
 
     return (
@@ -220,8 +256,9 @@ export default function ViewStockDevice() {
                         <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
                     </DemoContainer>
                 </LocalizationProvider>
+
                 <Button
-                    onClick={() => null}
+                    onClick={handleFilterDevices}
                     sx={{
                         backgroundColor: '#01153a',
                         color: '#fff',
@@ -233,6 +270,25 @@ export default function ViewStockDevice() {
                 >
                     <SearchIcon />
                     BUSCAR
+                </Button>
+                <Button
+                    onClick={() => {
+                        setDispach(!dispach)
+                        setSearch('')
+                        setSeriesNumber('')
+                        setDate(null)
+                    }}
+                    sx={{
+                        backgroundColor: '#01153a',
+                        color: '#fff',
+                        height: '56px',
+                        px: '15px',
+                        ':hover': { backgroundColor: '#010101' },
+                        gap: '5px',
+                    }}
+                >
+                    <DeleteForeverIcon />
+                    LIMPAR
                 </Button>
             </Grid>
             <Paper sx={{ width: '100%', overflow: 'hidden' }}>
