@@ -21,6 +21,8 @@ export default function InsertProduct({ productType }: InsertProductProps) {
     const [seriesNumber, setSeriesNumber] = useState<string>('')
     const [status, setStatus] = useState('')
     const [stateBattery, setStateBattery] = useState<string>('')
+    const [color, setColor] = useState<string>('')
+    const [supplier, setSupplier] = useState<string>('')
     const [maxDiscountAmout, setMaxDiscountAmout] = useState<string>('')
     const [check, setCheck] = useState<boolean>(false)
 
@@ -32,6 +34,8 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         name: nameDevice,
                         inputValue: Number(value.replace('R$: ', '')),
                         outputValue: Number(outputValue.replace('R$: ', '')),
+                        color: color,
+                        supplier: supplier,
                         type: type,
                         seriesNumber: seriesNumber,
                         status: status,
@@ -41,9 +45,18 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     .then((res) => {
                         setMessage(res.data)
                         setOpen(true)
+                        setNameDevice('')
+                        setValue('')
+                        setOutputValue('')
+                        setType('')
+                        setSeriesNumber('')
+                        setStatus('')
+                        setStateBattery('')
+                        setColor('')
+                        setSupplier('')
+                        setMaxDiscountAmout('')
                         setTimeout(() => {
                             setOpen(false)
-                            window.location.reload()
                         }, 2000)
                     })
             } else if (productType === 'Accessories') {
@@ -60,9 +73,15 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     .then((res) => {
                         setMessage(res.data)
                         setOpen(true)
+                        setNameDevice('')
+                        setValue('')
+                        setOutputValue('')
+                        setType('')
+                        setQuantity('')
+                        setStatus('')
+                        setMaxDiscountAmout('')
                         setTimeout(() => {
                             setOpen(false)
-                            window.location.reload()
                         }, 2000)
                     })
             }
@@ -96,7 +115,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     variant="outlined"
                     value={nameDevice}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setNameDevice(event.target.value)
+                        setNameDevice(event.target.value.toUpperCase())
                     }}
                 />
                 <InputMask
@@ -104,7 +123,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     maskPlaceholder={null}
                     value={value}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setValue(event.target.value)
+                        setValue(event.target.value.toUpperCase())
                     }}
                 >
                     <TextField fullWidth id="outlined-basic" label="Valor de entrada" variant="outlined" />
@@ -114,7 +133,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     maskPlaceholder={null}
                     value={outputValue}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setOutputValue(event.target.value)
+                        setOutputValue(event.target.value.toUpperCase())
                     }}
                     onBlur={() => {
                         if (Number(outputValue.replace('R$: ', '')) < Number(value.replace('R$: ', ''))) {
@@ -139,7 +158,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                             maskPlaceholder={null}
                             value={seriesNumber}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setSeriesNumber(event.target.value)
+                                setSeriesNumber(event.target.value.toUpperCase())
                             }}
                         >
                             <TextField fullWidth id="outlined-basic" label="Número de série" variant="outlined" />
@@ -149,7 +168,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                             maskPlaceholder={null}
                             value={stateBattery}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setStateBattery(event.target.value)
+                                setStateBattery(event.target.value.toUpperCase())
                             }}
                         >
                             <TextField
@@ -169,7 +188,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         maskPlaceholder={null}
                         value={quantity}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            setQuantity(event.target.value)
+                            setQuantity(event.target.value.toUpperCase())
                         }}
                     >
                         <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
@@ -182,21 +201,43 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     variant="outlined"
                     value={type}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setType(event.target.value)
+                        setType(event.target.value.toUpperCase())
                     }}
                 />
             </Grid>
             <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label={'Cor'}
+                    variant="outlined"
+                    value={color}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setColor(event.target.value.toUpperCase())
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label={'Fornecedor'}
+                    variant="outlined"
+                    value={supplier}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setSupplier(event.target.value.toUpperCase())
+                    }}
+                />
                 <InputMask
                     mask="R$: 99999"
                     maskPlaceholder={null}
                     value={maxDiscountAmout}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setMaxDiscountAmout(event.target.value)
+                        setMaxDiscountAmout(event.target.value.toUpperCase())
                     }}
                 >
                     <TextField fullWidth id="outlined-basic" label="Desconto máximo" variant="outlined" />
                 </InputMask>
+            </Grid>
+            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
                 <TextField
                     fullWidth
                     id="outlined-basic"
@@ -204,7 +245,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     variant="outlined"
                     value={status}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setStatus(event.target.value)
+                        setStatus(event.target.value.toUpperCase().toUpperCase())
                     }}
                 />
             </Grid>

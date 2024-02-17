@@ -20,7 +20,18 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 interface Column {
-    id: 'name' | 'inputValue' | 'outputValue' | 'type' | 'seriesNumber' | 'stateBattery' | 'maxDiscountAmout' | 'createdAt' | 'status'
+    id:
+        | 'name'
+        | 'inputValue'
+        | 'outputValue'
+        | 'seriesNumber'
+        | 'color'
+        | 'supplier'
+        | 'type'
+        | 'stateBattery'
+        | 'maxDiscountAmout'
+        | 'createdAt'
+        | 'status'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -32,19 +43,34 @@ const columns: readonly Column[] = [
     { id: 'inputValue', label: 'Valor de entrada', minWidth: 170, align: 'center' },
     { id: 'outputValue', label: 'Valor de saída', minWidth: 170, align: 'center' },
     {
-        id: 'type',
-        label: 'Tipo de aparelho',
-        minWidth: 170,
-        align: 'center',
-        format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
         id: 'seriesNumber',
         label: 'Numero de série',
         minWidth: 170,
         align: 'center',
         format: (value: number) => value.toLocaleString('en-US'),
     },
+    {
+        id: 'color',
+        label: 'Cor',
+        minWidth: 170,
+        align: 'center',
+        format: (value: number) => value.toLocaleString('en-US'),
+    },
+    {
+        id: 'supplier',
+        label: 'Fornecedor',
+        minWidth: 170,
+        align: 'center',
+        format: (value: number) => value.toLocaleString('en-US'),
+    },
+    {
+        id: 'type',
+        label: 'Tipo de aparelho',
+        minWidth: 170,
+        align: 'center',
+        format: (value: number) => value.toLocaleString('en-US'),
+    },
+
     {
         id: 'stateBattery',
         label: 'Estado da bateria',
@@ -79,6 +105,8 @@ function createData(
     name: string,
     inputValue: number,
     outputValue: number,
+    color: string,
+    supplier: string,
     type: string,
     seriesNumber: string,
     stateBattery: number,
@@ -90,6 +118,8 @@ function createData(
         name,
         inputValue,
         outputValue,
+        color,
+        supplier,
         type,
         seriesNumber,
         stateBattery,
@@ -136,6 +166,8 @@ export default function ViewStockDevice() {
             name: '',
             inputValue: 0,
             outputValue: 0,
+            color: '',
+            supplier: '',
             type: '',
             seriesNumber: '',
             status: '',
@@ -159,6 +191,8 @@ export default function ViewStockDevice() {
                         data.name,
                         data.inputValue,
                         data.outputValue,
+                        data.color,
+                        data.supplier,
                         data.type,
                         data.seriesNumber,
                         data.stateBattery,
@@ -193,14 +227,13 @@ export default function ViewStockDevice() {
                         numberSeries: seriesNumber ? seriesNumber : undefined,
                     },
                 })
-
-                console.log(response.data)
-
                 const formattedRows = response.data.map((data: Device) => {
                     return createData(
                         data.name,
                         data.inputValue,
                         data.outputValue,
+                        data.color,
+                        data.supplier,
                         data.type,
                         data.seriesNumber,
                         data.stateBattery,
@@ -237,7 +270,7 @@ export default function ViewStockDevice() {
                     variant="outlined"
                     value={search}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setSearch(event.target.value)
+                        setSearch(event.target.value.toUpperCase())
                     }}
                     sx={{ width: '20%' }}
                 />

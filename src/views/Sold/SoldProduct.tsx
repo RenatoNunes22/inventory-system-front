@@ -3,9 +3,7 @@ import {
     Button,
     Checkbox,
     FormControl,
-    FormHelperText,
     Grid,
-    InputAdornment,
     InputLabel,
     ListItemText,
     MenuItem,
@@ -226,13 +224,12 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 .then((res) => {
                     setMessage(res.data)
                     setOpen(true)
+                    if (res.data === 'Aparelho vendido com sucesso!') {
+                        clearState()
+                    }
                     setTimeout(() => {
                         setOpen(false)
-                        console.log(res.data)
-                        if (res.data === 'Aparelho vendido com sucesso!') {
-                            window.location.reload()
-                        }
-                    }, 1500)
+                    }, 2000)
                 })
         } else if (productType === 'Accessories') {
             axios
@@ -249,12 +246,12 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 .then((res) => {
                     setMessage(res.data)
                     setOpen(true)
+                    if (res.data === 'Acessório vendido com sucesso!') {
+                        clearState()
+                    }
                     setTimeout(() => {
                         setOpen(false)
-                        if (message === 'Acessório vendido com sucesso!') {
-                            window.location.reload()
-                        }
-                    }, 1000)
+                    }, 2000)
                 })
         }
     }
@@ -264,6 +261,34 @@ export default function SoldProduct({ productType }: InsertProductProps) {
             return true
         } else {
             return false
+        }
+    }
+
+    const clearState = () => {
+        if (productType === 'Device') {
+            setSeletedDevice(undefined)
+            setFees('')
+            setValue('')
+            setGift([])
+            setCPF('')
+            setEmail('')
+            setNameClient('')
+            setDn('')
+            setPhone('')
+            setCep('')
+            setState('')
+            setCity('')
+            setNeighborhood('')
+            setStreet('')
+            setNumber('')
+            setComplement('')
+            setPersonName([])
+        } else if (productType === 'Accessories') {
+            setSeletedAccessories(undefined)
+            setPersonName([])
+            setQuantity('')
+            setFees('')
+            setValue('')
         }
     }
 
@@ -316,9 +341,9 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                             value={
                                 productType === 'Device' && seletedDevice
                                     ? seletedDevice?.seriesNumber
-                                    : seletedAccessories
+                                    : productType === 'Accessories' && seletedAccessories
                                     ? seletedAccessories?.name
-                                    : undefined
+                                    : ''
                             }
                             label="Selecione o produto"
                             onChange={handleChange}
@@ -353,23 +378,17 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         </Select>
                     </FormControl>
                 </Box>
-                <FormControl fullWidth>
-                    <InputLabel htmlFor="outlined-adornment-amount">Valor da tarifa</InputLabel>
-                    <OutlinedInput
-                        error={fees && isNaN(Number(fees)) ? true : false}
-                        id="outlined-adornment-amount"
-                        startAdornment={fees !== '' ? <InputAdornment position="start">R$</InputAdornment> : null}
-                        label="Valor da tarifa"
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            setFees(event.target.value)
-                        }}
-                    />
-                    {fees && isNaN(Number(fees)) && (
-                        <FormHelperText error id="accountId-error">
-                            Apenas números
-                        </FormHelperText>
-                    )}
-                </FormControl>
+                <InputMask
+                    mask="R$: 99999"
+                    maskPlaceholder={null}
+                    value={fees}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setFees(event.target.value)
+                    }}
+                >
+                    <TextField fullWidth id="outlined-basic" label="Valor da tarifa" variant="outlined" />
+                </InputMask>
+
                 {productType === 'Device' ? (
                     <Box sx={{ minWidth: '200px', width: '100%' }}>
                         <FormControl fullWidth>
@@ -397,7 +416,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     <InputMask
                         mask="9999"
                         maskPlaceholder={null}
-                        value={quantity ? quantity : undefined}
+                        value={quantity}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setQuantity(event.target.value)
                         }}
