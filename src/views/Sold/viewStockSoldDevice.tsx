@@ -12,13 +12,14 @@ import axios from 'axios'
 import { SoldDevice } from '../../model/SoldDevice'
 import { formatarData } from '../../utils/formatterData'
 import { Card } from '../../components/Cards/Card'
-import { Button, Grid } from '@mui/material'
+import { Box, Button, Grid } from '@mui/material'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import SearchIcon from '@mui/icons-material/Search'
 import dayjs, { Dayjs } from 'dayjs'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 interface Column {
     id: 'name' | 'soldValue' | 'seriesNumber' | 'gift' | 'expenses' | 'fees' | 'formPayment' | 'client' | 'seller' | 'soldAt'
@@ -147,6 +148,7 @@ function createData(
 
 export default function ViewStockSoldDevice() {
     const dateCurrent = new Date()
+    const isMobile = useMedia('(max-width: 800px)')
     const [page, setPage] = React.useState(0)
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
     const [date, setDate] = React.useState<Dayjs | null>(dayjs(dateCurrent.setHours(new Date().getHours() - 3)))
@@ -262,7 +264,7 @@ export default function ViewStockSoldDevice() {
             <Grid
                 container={true}
                 display={'flex'}
-                direction={'row'}
+                direction={isMobile ? 'column' : 'row'}
                 alignItems={'end'}
                 justifyContent={'start'}
                 xs={12}
@@ -270,11 +272,13 @@ export default function ViewStockSoldDevice() {
                 xl={12}
                 gap={1}
             >
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker']}>
-                        <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
-                    </DemoContainer>
-                </LocalizationProvider>
+                <Box sx={{ width: isMobile ? '100%' : null }}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer components={['DatePicker']}>
+                            <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
+                        </DemoContainer>
+                    </LocalizationProvider>
+                </Box>
                 <Button
                     onClick={searchSold}
                     sx={{
@@ -284,6 +288,7 @@ export default function ViewStockSoldDevice() {
                         px: '15px',
                         ':hover': { backgroundColor: '#010101' },
                         gap: '5px',
+                        width: isMobile ? '100%' : null,
                     }}
                 >
                     <SearchIcon />
@@ -293,7 +298,7 @@ export default function ViewStockSoldDevice() {
             <Grid
                 container={true}
                 display={'flex'}
-                direction={'row'}
+                direction={isMobile ? 'column' : 'row'}
                 alignItems={'center'}
                 justifyContent={'space-between'}
                 xs={12}

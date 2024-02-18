@@ -11,13 +11,14 @@ import axios from 'axios'
 import { formatarData } from '../../utils/formatterData'
 import { Accessories } from '../../model/Accessories'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
-import { Button, Grid, TextField } from '@mui/material'
+import { Box, Button, Grid, TextField } from '@mui/material'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
 import { Dayjs } from 'dayjs'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import SearchIcon from '@mui/icons-material/Search'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 interface Column {
     id: 'name' | 'inputValue' | 'type' | 'quantity' | 'maxDiscountAmout' | 'createdAt' | 'status'
@@ -91,6 +92,7 @@ function createData(
 
 export default function ViewStockAccesories() {
     const [search, setSearch] = React.useState('')
+    const isMobile = useMedia('(max-width: 1150px)')
     const [dispach, setDispach] = React.useState(true)
     const [date, setDate] = React.useState<Dayjs | null>(null)
     const [page, setPage] = React.useState(0)
@@ -181,7 +183,7 @@ export default function ViewStockAccesories() {
             <Grid
                 container={true}
                 display={'flex'}
-                direction={'row'}
+                direction={isMobile ? 'column' : 'row'}
                 alignItems={'end'}
                 justifyContent={'start'}
                 xs={12}
@@ -198,14 +200,15 @@ export default function ViewStockAccesories() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setSearch(event.target.value)
                     }}
-                    sx={{ width: '20%' }}
+                    sx={{ width: isMobile ? '100%' : '20%' }}
                 />
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker']}>
-                        <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
-                    </DemoContainer>
-                </LocalizationProvider>
-
+                <Box sx={{ width: isMobile ? '100%' : null }}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer components={['DatePicker']}>
+                            <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
+                        </DemoContainer>
+                    </LocalizationProvider>
+                </Box>
                 <Button
                     onClick={handleFilterDevices}
                     sx={{
@@ -215,6 +218,7 @@ export default function ViewStockAccesories() {
                         px: '15px',
                         ':hover': { backgroundColor: '#010101' },
                         gap: '5px',
+                        width: isMobile ? '100%' : null,
                     }}
                 >
                     <SearchIcon />
@@ -233,6 +237,7 @@ export default function ViewStockAccesories() {
                         px: '15px',
                         ':hover': { backgroundColor: '#010101' },
                         gap: '5px',
+                        width: isMobile ? '100%' : null,
                     }}
                 >
                     <DeleteForeverIcon />

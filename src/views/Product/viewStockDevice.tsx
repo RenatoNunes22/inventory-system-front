@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow'
 import axios from 'axios'
 import { Device } from '../../model/Device'
 import { formatarData } from '../../utils/formatterData'
-import { Button, Grid, TextField } from '@mui/material'
+import { Box, Button, Grid, TextField } from '@mui/material'
 import InputMask from 'react-input-mask'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
@@ -18,6 +18,7 @@ import { Dayjs } from 'dayjs'
 import SearchIcon from '@mui/icons-material/Search'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import { useMedia } from '../../hooks/mediaQueryHook'
 
 interface Column {
     id:
@@ -156,6 +157,7 @@ function createData(
 
 export default function ViewStockDevice() {
     const [page, setPage] = React.useState(0)
+    const isMobile = useMedia('(max-width: 1150px)')
     const [dispach, setDispach] = React.useState(true)
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
     const [search, setSearch] = React.useState('')
@@ -205,7 +207,6 @@ export default function ViewStockDevice() {
                 setRows(formattedRows)
             } catch (error) {
                 console.error('Error fetching data:', error)
-                // Trate o erro conforme necessário
             }
         }
 
@@ -255,7 +256,7 @@ export default function ViewStockDevice() {
             <Grid
                 container={true}
                 display={'flex'}
-                direction={'row'}
+                direction={isMobile ? 'column' : 'row'}
                 alignItems={'end'}
                 justifyContent={'start'}
                 xs={12}
@@ -272,7 +273,7 @@ export default function ViewStockDevice() {
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setSearch(event.target.value.toUpperCase())
                     }}
-                    sx={{ width: '20%' }}
+                    sx={{ width: isMobile ? '100%' : '20%' }}
                 />
                 <InputMask
                     mask="9999999999"
@@ -282,14 +283,21 @@ export default function ViewStockDevice() {
                         setSeriesNumber(event.target.value)
                     }}
                 >
-                    <TextField fullWidth id="outlined-basic" label="Número de série" variant="outlined" sx={{ width: '20%' }} />
+                    <TextField
+                        fullWidth
+                        id="outlined-basic"
+                        label="Número de série"
+                        variant="outlined"
+                        sx={{ width: isMobile ? '100%' : '20%' }}
+                    />
                 </InputMask>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker']}>
-                        <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
-                    </DemoContainer>
-                </LocalizationProvider>
-
+                <Box sx={{ width: isMobile ? '100%' : null }}>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DemoContainer components={['DatePicker']}>
+                            <DatePicker disableFuture={true} format="DD/MM/YYYY" value={date} onChange={setDate} label="Seleciona o dia" />
+                        </DemoContainer>
+                    </LocalizationProvider>
+                </Box>
                 <Button
                     onClick={handleFilterDevices}
                     sx={{
@@ -299,6 +307,7 @@ export default function ViewStockDevice() {
                         px: '15px',
                         ':hover': { backgroundColor: '#010101' },
                         gap: '5px',
+                        width: isMobile ? '100%' : null,
                     }}
                 >
                     <SearchIcon />
@@ -318,6 +327,7 @@ export default function ViewStockDevice() {
                         px: '15px',
                         ':hover': { backgroundColor: '#010101' },
                         gap: '5px',
+                        width: isMobile ? '100%' : null,
                     }}
                 >
                     <DeleteForeverIcon />

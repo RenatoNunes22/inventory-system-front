@@ -62,10 +62,7 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                 }}
             >
                 <img src={modeTheme ? Logo : LogoWhite} width={isMobile ? '150px' : '130px'} />
-                <div
-                    className="containerButtons"
-                    style={{ gap: isMobile ? '20px' : '40px', width: isMobile ? '100%' : '' }}
-                >
+                <div className="containerButtons" style={{ gap: isMobile ? '20px' : '40px', width: isMobile ? '100%' : '' }}>
                     <Button
                         onClick={() => {
                             setClick('Vendas')
@@ -97,6 +94,21 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                                 className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Usuarios</div>
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    navigate('/')
+                                }}
+                                sx={{
+                                    borderRadius: 10,
+                                    color: '#FFF',
+                                    backgroundColor: '#0083c5',
+                                    cursor: 'pointer',
+                                    px: 4,
+                                    '&:hover': { backgroundColor: '#003e6d' },
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>SAIR</div>
                             </Button>
                         </>
                     )}
