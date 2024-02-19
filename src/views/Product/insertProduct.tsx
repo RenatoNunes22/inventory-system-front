@@ -150,7 +150,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     label="Valor de saída"
                     variant="outlined"
                     error={countDecimalPlaces(outputValue) > 2 ? true : false}
-                    helperText={countDecimalPlaces(value) > 2 ? 'Valor com no máximo 2 casas decimais!' : undefined}
+                    helperText={countDecimalPlaces(outputValue) > 2 ? 'Valor com no máximo 2 casas decimais!' : undefined}
                     value={outputValue}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setOutputValue(event.target.value.toUpperCase())
