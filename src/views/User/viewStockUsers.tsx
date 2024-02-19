@@ -11,6 +11,7 @@ import TableRow from '@mui/material/TableRow'
 import axios from 'axios'
 import { formatarData } from '../../utils/formatterData'
 import { User } from '../../model/User'
+import Loading from '../../components/Loading'
 
 interface Column {
     id: 'email' | 'cpf' | 'name' | 'dn' | 'role' | 'telephone' | 'productSold' | 'createdAt'
@@ -100,34 +101,10 @@ function createData(
     }
 }
 
-//const token = localStorage.getItem('token')
-
-// const config = {
-//     headers: {
-//         Authorization: `Bearer ${token}`,
-//     },
-// }
-
-// const rows = await axios
-//     .get(`${import.meta.env.VITE_API_URI}/devices`, config)
-//     .then((res) =>
-//         res.data.map((data: Device) =>
-//             createData(
-//                 data.name,
-//                 data.value,
-//                 data.type,
-//                 data.seriesNumber,
-//                 data.stateBattery,
-//                 data.maxDiscountAmout,
-//                 formatarData(data.createdAt),
-//                 data.status
-//             )
-//         )
-//     )
-
 export default function ViewStockUser() {
     const [page, setPage] = React.useState(0)
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
+    const [finish, setFinish] = React.useState(true)
     const [rows, setRows] = React.useState<Array<any>>([
         {
             email: '',
@@ -148,6 +125,7 @@ export default function ViewStockUser() {
 
     React.useEffect(() => {
         const fetchData = async () => {
+            setFinish(false)
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URI}/users`)
                 const formattedRows = response.data.map((data: User) => {
@@ -166,7 +144,8 @@ export default function ViewStockUser() {
                 setRows(formattedRows)
             } catch (error) {
                 console.error('Error fetching data:', error)
-                // Trate o erro conforme necessário
+            } finally {
+                setFinish(true)
             }
         }
 
@@ -179,57 +158,58 @@ export default function ViewStockUser() {
     }
 
     return (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <TableContainer sx={{ maxHeight: 440 }}>
-                <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((column) => (
-                                <TableCell
-                                    key={column.id}
-                                    align={column.align}
-                                    style={{ minWidth: column.minWidth }}
-                                    sx={{
-                                        backgroundColor: '#e0e0e0',
-                                        color: '#000',
-                                        fontSize: 18,
-                                    }}
-                                >
-                                    {column.label}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any) => {
-                            return (
-                                <TableRow hover role="checkbox" tabIndex={-1} key={row.cpf}>
-                                    {columns.map((column) => {
-                                        const value = row[column.id]
-                                        console.log(row.productSold)
-                                        return (
-                                            <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
-                                                {column.format && typeof value === 'number'
-                                                    ? column.format(value)
-                                                    : value}
-                                            </TableCell>
-                                        )
-                                    })}
-                                </TableRow>
-                            )
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
-                component="div"
-                count={rows.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={() => handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-        </Paper>
+        <>
+            {finish && <Loading />}
+            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+                <TableContainer sx={{ maxHeight: 440 }}>
+                    <Table stickyHeader aria-label="sticky table">
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((column) => (
+                                    <TableCell
+                                        key={column.id}
+                                        align={column.align}
+                                        style={{ minWidth: column.minWidth }}
+                                        sx={{
+                                            backgroundColor: '#e0e0e0',
+                                            color: '#000',
+                                            fontSize: 18,
+                                        }}
+                                    >
+                                        {column.label}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: any) => {
+                                return (
+                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.cpf}>
+                                        {columns.map((column) => {
+                                            const value = row[column.id]
+                                            console.log(row.productSold)
+                                            return (
+                                                <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
+                                                    {column.format && typeof value === 'number' ? column.format(value) : value}
+                                                </TableCell>
+                                            )
+                                        })}
+                                    </TableRow>
+                                )
+                            })}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <TablePagination
+                    rowsPerPageOptions={[10, 25, 100]}
+                    component="div"
+                    count={rows.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={() => handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            </Paper>
+        </>
     )
 }
