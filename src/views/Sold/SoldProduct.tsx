@@ -4,6 +4,7 @@ import {
     Checkbox,
     FormControl,
     Grid,
+    InputAdornment,
     InputLabel,
     ListItemText,
     MenuItem,
@@ -22,6 +23,7 @@ import { Client } from '../../model/Client'
 import InputMask from 'react-input-mask'
 import { useMedia } from '../../hooks/mediaQueryHook'
 import Loading from '../../components/Loading'
+import { countDecimalPlaces } from '../../utils/countDecimalPlaces'
 
 type InsertProductProps = {
     productType: string
@@ -436,9 +438,15 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
                     </InputMask>
                 )}
-                <InputMask
-                    mask="R$: 99999"
-                    maskPlaceholder={null}
+
+                <TextField
+                    fullWidth
+                    type="number"
+                    id="outlined-basic"
+                    label="Valor do produto"
+                    variant="outlined"
+                    error={countDecimalPlaces(value) > 2 ? true : false}
+                    helperText={countDecimalPlaces(value) > 2 ? 'Valor com no máximo 2 casas decimais!' : undefined}
                     value={value}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setValue(event.target.value)
@@ -453,9 +461,10 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                             }, 2000)
                         }
                     }}
-                >
-                    <TextField fullWidth id="outlined-basic" label="Valor do produto" variant="outlined" />
-                </InputMask>
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
+                    }}
+                />
             </Grid>
             {productType === 'Device' && (
                 <>

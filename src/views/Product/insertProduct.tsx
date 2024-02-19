@@ -5,6 +5,7 @@ import Snackbars from '../../components/SnackBar'
 import { useMedia } from '../../hooks/mediaQueryHook'
 import InputMask from 'react-input-mask'
 import Loading from '../../components/Loading'
+import { countDecimalPlaces } from '../../utils/countDecimalPlaces'
 
 type InsertProductProps = {
     productType: string
@@ -125,22 +126,37 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         setNameDevice(event.target.value.toUpperCase())
                     }}
                 />
-                <InputMask
-                    mask="R$: 999999"
-                    maskPlaceholder={null}
+
+                <TextField
+                    fullWidth
+                    type="number"
+                    id="outlined-basic"
+                    label="Valor de entrada"
+                    variant="outlined"
+                    error={countDecimalPlaces(value) > 2 ? true : false}
+                    helperText={countDecimalPlaces(value) > 2 ? 'Valor com no máximo 2 casas decimais!' : undefined}
                     value={value}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setValue(event.target.value.toUpperCase())
+                        setValue(event.target.value)
                     }}
-                >
-                    <TextField fullWidth id="outlined-basic" label="Valor de entrada" variant="outlined" />
-                </InputMask>
-                <InputMask
-                    mask="R$: 999999"
-                    maskPlaceholder={null}
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    type="number"
+                    id="outlined-basic"
+                    label="Valor de saída"
+                    variant="outlined"
+                    error={countDecimalPlaces(outputValue) > 2 ? true : false}
+                    helperText={countDecimalPlaces(value) > 2 ? 'Valor com no máximo 2 casas decimais!' : undefined}
                     value={outputValue}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                         setOutputValue(event.target.value.toUpperCase())
+                    }}
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
                     }}
                     onBlur={() => {
                         if (Number(outputValue.replace('R$: ', '')) < Number(value.replace('R$: ', ''))) {
@@ -152,9 +168,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                             }, 2000)
                         }
                     }}
-                >
-                    <TextField fullWidth id="outlined-basic" label="Valor de saída" variant="outlined" />
-                </InputMask>
+                />
             </Grid>
 
             <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
