@@ -1,4 +1,4 @@
-import LogoSingle from '../../assets/Logo.png'
+import LogoSingle from '../../assets/appleLogo.svg'
 
 import './style.css'
 

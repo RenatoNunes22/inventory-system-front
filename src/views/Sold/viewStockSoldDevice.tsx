@@ -20,6 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import SearchIcon from '@mui/icons-material/Search'
 import dayjs, { Dayjs } from 'dayjs'
 import { useMedia } from '../../hooks/mediaQueryHook'
+import Loading from '../../components/Loading'
 
 interface Column {
     id: 'name' | 'soldValue' | 'seriesNumber' | 'gift' | 'expenses' | 'fees' | 'formPayment' | 'client' | 'seller' | 'soldAt'
@@ -150,6 +151,7 @@ export default function ViewStockSoldDevice() {
     const dateCurrent = new Date()
     const isMobile = useMedia('(max-width: 800px)')
     const [page, setPage] = React.useState(0)
+    const [finish, setFinish] = React.useState(true)
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
     const [date, setDate] = React.useState<Dayjs | null>(dayjs(dateCurrent.setHours(new Date().getHours() - 3)))
     const [profit, setProfit] = React.useState<number>(0)
@@ -174,6 +176,7 @@ export default function ViewStockSoldDevice() {
     }
 
     React.useEffect(() => {
+        setFinish(false)
         const fetchData = async () => {
             try {
                 const dateSold = new Date(String(date)).toISOString().split('T')[0]
@@ -210,6 +213,8 @@ export default function ViewStockSoldDevice() {
                 })
             } catch (error) {
                 console.error('Error fetching data:', error)
+            } finally {
+                setFinish(true)
             }
         }
         fetchData()
@@ -221,6 +226,7 @@ export default function ViewStockSoldDevice() {
     }
 
     const searchSold = async () => {
+        setFinish(false)
         const dateSold = new Date(String(date)).toISOString().split('T')[0]
         Promise.all([
             axios.get(`${import.meta.env.VITE_API_URI}/profit/${dateSold}`),
@@ -257,10 +263,14 @@ export default function ViewStockSoldDevice() {
             .catch((err) => {
                 console.log(err)
             })
+            .finally(() => {
+                setFinish(true)
+            })
     }
 
     return (
         <>
+            {!finish && <Loading />}
             <Grid
                 container={true}
                 display={'flex'}

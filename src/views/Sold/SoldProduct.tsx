@@ -21,6 +21,7 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import { Client } from '../../model/Client'
 import InputMask from 'react-input-mask'
 import { useMedia } from '../../hooks/mediaQueryHook'
+import Loading from '../../components/Loading'
 
 type InsertProductProps = {
     productType: string
@@ -40,6 +41,7 @@ const MenuProps = {
 export default function SoldProduct({ productType }: InsertProductProps) {
     const isMobile = useMedia('(max-width: 1220px)')
     const user = localStorage.getItem('user')?.replace(/"/g, '')
+    const [finish, setFinish] = useState(true)
     const [listDevice, setListDevice] = useState<Device[]>()
     const [listAccessories, setListAccessories] = useState<Array<string>>()
     const [search, setSearch] = useState<number | string>('')
@@ -153,14 +155,16 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [cpf])
 
     useEffect(() => {
-        Promise.all([
-            axios.get(`${import.meta.env.VITE_API_URI}/devices/`),
-            axios.get(`${import.meta.env.VITE_API_URI}/accessories/`),
-        ]).then((res) => {
-            setListDevice(res[0].data)
-            const listItems = res[1].data.map((item: Accessories) => item.name)
-            setListAccessories(listItems)
-        })
+        setFinish(false)
+        Promise.all([axios.get(`${import.meta.env.VITE_API_URI}/devices/`), axios.get(`${import.meta.env.VITE_API_URI}/accessories/`)])
+            .then((res) => {
+                setListDevice(res[0].data)
+                const listItems = res[1].data.map((item: Accessories) => item.name)
+                setListAccessories(listItems)
+            })
+            .finally(() => {
+                setFinish(true)
+            })
     }, [productType, open])
 
     useEffect(() => {
@@ -192,6 +196,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }, [seletedDevice, seletedAccessories])
 
     const soldProduct = () => {
+        setFinish(false)
         if (selectedClient === undefined || productType === 'Device') {
             axios.post(`${import.meta.env.VITE_API_URI}/clients`, {
                 email: email,
@@ -227,6 +232,9 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     if (res.data === 'Aparelho vendido com sucesso!') {
                         clearState()
                     }
+                })
+                .finally(() => {
+                    setFinish(true)
                     setTimeout(() => {
                         setOpen(false)
                     }, 2000)
@@ -249,9 +257,12 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     if (res.data === 'Acessório vendido com sucesso!') {
                         clearState()
                     }
+                })
+                .finally(() => {
+                    setFinish(true)
                     setTimeout(() => {
                         setOpen(false)
-                    }, 2000)
+                    })
                 })
         }
     }
@@ -324,6 +335,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
 
     return (
         <>
+            {!finish && <Loading />}
             <Grid
                 item
                 display={'flex'}

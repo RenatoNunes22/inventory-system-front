@@ -19,6 +19,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import SearchIcon from '@mui/icons-material/Search'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useMedia } from '../../hooks/mediaQueryHook'
+import Loading from '../../components/Loading'
 
 interface Column {
     id: 'name' | 'inputValue' | 'type' | 'quantity' | 'maxDiscountAmout' | 'createdAt' | 'status'
@@ -93,6 +94,7 @@ function createData(
 export default function ViewStockAccesories() {
     const [search, setSearch] = React.useState('')
     const isMobile = useMedia('(max-width: 1150px)')
+    const [finish, setFinish] = React.useState(true)
     const [dispach, setDispach] = React.useState(true)
     const [date, setDate] = React.useState<Dayjs | null>(null)
     const [page, setPage] = React.useState(0)
@@ -112,6 +114,7 @@ export default function ViewStockAccesories() {
 
     React.useEffect(() => {
         const fetchData = async () => {
+            setFinish(false)
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URI}/accessories`)
 
@@ -131,6 +134,8 @@ export default function ViewStockAccesories() {
                 setRows(formattedRows)
             } catch (error) {
                 console.error('Error fetching data:', error)
+            } finally {
+                setFinish(true)
             }
         }
 
@@ -147,6 +152,7 @@ export default function ViewStockAccesories() {
     }
 
     const handleFilterDevices = async () => {
+        setFinish(false)
         try {
             if (!search || !date) {
                 const response = await axios.get(`${import.meta.env.VITE_API_URI}/filterAccessories/data`, {
@@ -175,11 +181,14 @@ export default function ViewStockAccesories() {
             }
         } catch (error) {
             console.error('Error fetching data:', error)
+        } finally {
+            setFinish(true)
         }
     }
 
     return (
         <>
+            {!finish && <Loading />}
             <Grid
                 container={true}
                 display={'flex'}

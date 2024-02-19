@@ -13,10 +13,12 @@ import { useMedia } from '../../hooks/mediaQueryHook'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useLocalStorage } from '../../hooks/localStorageHook'
+import Loading from '../../components/Loading'
 
 export const Login: React.FC = () => {
     const navigate = useNavigate()
     const isMobile = useMedia('(max-width: 1050px)')
+    const [finish, setFinish] = useState(true)
     const [success, setSuccess] = useState<string>('')
     const [, setToken] = useLocalStorage('token', '')
     const [, setUser] = useLocalStorage('user', '')
@@ -37,6 +39,7 @@ export const Login: React.FC = () => {
 
     const LoginFunction = (event: any) => {
         event.preventDefault()
+        setFinish(false)
         axios
             .post(`${import.meta.env.VITE_API_URI}/login`, {
                 email: username,
@@ -60,6 +63,9 @@ export const Login: React.FC = () => {
             .catch(() => {
                 setSuccess('Usuário ou senha incorretos')
             })
+            .finally(() => {
+                setFinish(true)
+            })
     }
 
     useEffect(() => {
@@ -69,66 +75,62 @@ export const Login: React.FC = () => {
     }, [success])
 
     return (
-        <div className={isMobile ? 'containerLoginMobile' : 'containerLogin'}>
-            <form className={isMobile ? 'formStyleMobile' : 'formStyle'}>
-                <img src={isMobile ? LogoMobile : Logo} style={{ marginBottom: '80px' }} />
-                <div className={isMobile ? 'usernameStyleMobile' : 'usernameStyle'}>
-                    <input
-                        required
-                        className="inputStyle"
-                        placeholder="Digite seu usuário"
-                        type="text"
-                        id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <label htmlFor="username">
-                        <AccountCircleIcon sx={{ fontSize: '30px' }} />
-                    </label>
-                </div>
-                <div className={isMobile ? 'passwordStyleMobile' : 'passwordStyle'}>
-                    <input
-                        required
-                        className="inputStyle"
-                        placeholder="Digite sua senha"
-                        type={showPassword ? 'text' : 'password'}
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <label htmlFor="password">
-                        {showPassword ? (
-                            <VisibilityIcon sx={{ fontSize: '30px', cursor: 'pointer' }} onClick={toggleShowPassword} />
-                        ) : (
-                            <VisibilityOffIcon
-                                sx={{ fontSize: '30px', cursor: 'pointer' }}
-                                onClick={toggleShowPassword}
-                            />
-                        )}
-                    </label>
-                </div>
-                <button
-                    onClick={LoginFunction}
-                    type="submit"
-                    className={isMobile ? 'buttonStyleMobile' : 'buttonStyle'}
-                >
-                    Entrar
-                </button>
-                {success !== '' && (
-                    <span
-                        className={success === 'Usuário ou senha incorretos' ? 'successRed' : 'successGreen'}
-                        style={{ width: isMobile ? '300px' : '350px' }}
-                    >
-                        {success === 'Usuário ou senha incorretos' ? <ErrorIcon /> : <CheckCircleOutlineIcon />}
-                        {success}
-                    </span>
+        <>
+            {!finish && <Loading />}
+            <div className={isMobile ? 'containerLoginMobile' : 'containerLogin'}>
+                <form className={isMobile ? 'formStyleMobile' : 'formStyle'}>
+                    <img src={isMobile ? LogoMobile : Logo} style={{ marginBottom: '80px' }} />
+                    <div className={isMobile ? 'usernameStyleMobile' : 'usernameStyle'}>
+                        <input
+                            required
+                            className="inputStyle"
+                            placeholder="Digite seu usuário"
+                            type="text"
+                            id="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                        <label htmlFor="username">
+                            <AccountCircleIcon sx={{ fontSize: '30px' }} />
+                        </label>
+                    </div>
+                    <div className={isMobile ? 'passwordStyleMobile' : 'passwordStyle'}>
+                        <input
+                            required
+                            className="inputStyle"
+                            placeholder="Digite sua senha"
+                            type={showPassword ? 'text' : 'password'}
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <label htmlFor="password">
+                            {showPassword ? (
+                                <VisibilityIcon sx={{ fontSize: '30px', cursor: 'pointer' }} onClick={toggleShowPassword} />
+                            ) : (
+                                <VisibilityOffIcon sx={{ fontSize: '30px', cursor: 'pointer' }} onClick={toggleShowPassword} />
+                            )}
+                        </label>
+                    </div>
+                    <button onClick={LoginFunction} type="submit" className={isMobile ? 'buttonStyleMobile' : 'buttonStyle'}>
+                        Entrar
+                    </button>
+                    {success !== '' && (
+                        <span
+                            className={success === 'Usuário ou senha incorretos' ? 'successRed' : 'successGreen'}
+                            style={{ width: isMobile ? '300px' : '350px' }}
+                        >
+                            {success === 'Usuário ou senha incorretos' ? <ErrorIcon /> : <CheckCircleOutlineIcon />}
+                            {success}
+                        </span>
+                    )}
+                </form>
+                {!isMobile && (
+                    <div className="imgBackground">
+                        <img src={imgBackground} className="img" />
+                    </div>
                 )}
-            </form>
-            {!isMobile && (
-                <div className="imgBackground">
-                    <img src={imgBackground} className="img" />
-                </div>
-            )}
-        </div>
+            </div>
+        </>
     )
 }

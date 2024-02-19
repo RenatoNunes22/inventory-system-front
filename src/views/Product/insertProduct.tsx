@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Snackbars from '../../components/SnackBar'
 import { useMedia } from '../../hooks/mediaQueryHook'
 import InputMask from 'react-input-mask'
+import Loading from '../../components/Loading'
 
 type InsertProductProps = {
     productType: string
@@ -12,6 +13,7 @@ type InsertProductProps = {
 export default function InsertProduct({ productType }: InsertProductProps) {
     const isMobile = useMedia('(max-width: 850px)')
     const [quantity, setQuantity] = useState<string>('')
+    const [finish, setFinish] = useState(true)
     const [message, setMessage] = useState<string>('')
     const [open, setOpen] = useState(false)
     const [nameDevice, setNameDevice] = useState('')
@@ -27,6 +29,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
     const [check, setCheck] = useState<boolean>(false)
 
     const insertProduct = () => {
+        setFinish(false)
         if (check) {
             if (productType === 'Device') {
                 axios
@@ -43,8 +46,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         maxDiscountAmout: maxDiscountAmout ? Number(maxDiscountAmout.replace('R$: ', '')) : 0,
                     })
                     .then((res) => {
-                        setMessage(res.data)
-                        setOpen(true)
+                        setMessage(res.data), setOpen(true)
                         setNameDevice('')
                         setValue('')
                         setOutputValue('')
@@ -55,9 +57,12 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         setColor('')
                         setSupplier('')
                         setMaxDiscountAmout('')
-                        setTimeout(() => {
-                            setOpen(false)
-                        }, 2000)
+                    })
+                    .finally(() => {
+                        setFinish(true),
+                            setTimeout(() => {
+                                setOpen(false)
+                            }, 2000)
                     })
             } else if (productType === 'Accessories') {
                 axios
@@ -84,22 +89,24 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                             setOpen(false)
                         }, 2000)
                     })
+                    .finally(() => setFinish(true))
             }
         }
     }
 
     useEffect(() => {
-        if (productType === 'Device' && nameDevice && value && type && seriesNumber && stateBattery) {
+        if (productType === 'Device' && nameDevice && value && seriesNumber) {
             setCheck(true)
-        } else if (productType === 'Accessories' && nameDevice && value && type && quantity) {
+        } else if (productType === 'Accessories' && nameDevice && value && quantity) {
             setCheck(true)
         } else {
             setCheck(false)
         }
-    }, [nameDevice, seriesNumber, stateBattery, type, value, quantity])
+    }, [nameDevice, seriesNumber, value, quantity])
 
     return (
         <>
+            {!finish && <Loading />}
             <Grid
                 item
                 display={'flex'}

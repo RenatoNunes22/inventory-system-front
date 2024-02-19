@@ -19,6 +19,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useMedia } from '../../hooks/mediaQueryHook'
+import Loading from '../../components/Loading'
 
 interface Column {
     id:
@@ -130,33 +131,9 @@ function createData(
     }
 }
 
-//const token = localStorage.getItem('token')
-
-// const config = {
-//     headers: {
-//         Authorization: `Bearer ${token}`,
-//     },
-// }
-
-// const rows = await axios
-//     .get(`${import.meta.env.VITE_API_URI}/devices`, config)
-//     .then((res) =>
-//         res.data.map((data: Device) =>
-//             createData(
-//                 data.name,
-//                 data.value,
-//                 data.type,
-//                 data.seriesNumber,
-//                 data.stateBattery,
-//                 data.maxDiscountAmout,
-//                 formatarData(data.createdAt),
-//                 data.status
-//             )
-//         )
-//     )
-
 export default function ViewStockDevice() {
     const [page, setPage] = React.useState(0)
+    const [finish, setFinish] = React.useState(true)
     const isMobile = useMedia('(max-width: 1150px)')
     const [dispach, setDispach] = React.useState(true)
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
@@ -185,6 +162,7 @@ export default function ViewStockDevice() {
 
     React.useEffect(() => {
         const fetchData = async () => {
+            setFinish(false)
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URI}/devices`)
 
@@ -207,6 +185,8 @@ export default function ViewStockDevice() {
                 setRows(formattedRows)
             } catch (error) {
                 console.error('Error fetching data:', error)
+            } finally {
+                setFinish(true)
             }
         }
 
@@ -219,6 +199,7 @@ export default function ViewStockDevice() {
     }
 
     const handleFilterDevices = async () => {
+        setFinish(false)
         try {
             if (!search || !date || !seriesNumber) {
                 const response = await axios.get(`${import.meta.env.VITE_API_URI}/filterDevice/data`, {
@@ -248,11 +229,14 @@ export default function ViewStockDevice() {
             }
         } catch (error) {
             console.error('Error fetching data:', error)
+        } finally {
+            setFinish(true)
         }
     }
 
     return (
         <>
+            {!finish && <Loading />}
             <Grid
                 container={true}
                 display={'flex'}
