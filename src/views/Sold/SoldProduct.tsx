@@ -24,6 +24,7 @@ import InputMask from 'react-input-mask'
 import { useMedia } from '../../hooks/mediaQueryHook'
 import Loading from '../../components/Loading'
 import { countDecimalPlaces } from '../../utils/countDecimalPlaces'
+import { formattValue } from '../../utils/formattValue'
 
 type InsertProductProps = {
     productType: string
@@ -52,6 +53,8 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     const [seletedClient, setSeletedClient] = useState<Client>()
     const [gift, setGift] = useState<string[]>([])
     const [minValue, setMinValue] = useState<number>()
+    const [errorValue, setErrorValue] = useState<boolean>(false)
+    const [errorFees, setErrorFees] = useState<boolean>(false)
 
     //CLIENT
     const [selectedClient, setSelectedClient] = useState<Client>()
@@ -106,8 +109,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
             setMinValue((seletedAccessories?.outputValue - seletedAccessories?.maxDiscountAmout) * Number(quantity))
         }
     }, [seletedDevice, seletedAccessories, quantity, productType])
-
-    console.log('seletedDevice', seletedAccessories)
 
     useEffect(() => {
         const newCEP = cep.replace(caracteresARemover, '')
@@ -219,7 +220,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         if (productType === 'Device') {
             axios
                 .post(`${import.meta.env.VITE_API_URI}/deviceSold/${search}`, {
-                    soldValue: Number(value.replace('R$: ', '')),
+                    soldValue: Number(formattValue(value)),
                     seriesNumber: seletedDevice?.seriesNumber,
                     expenses: 0,
                     fees: fees && !isNaN(Number(fees)) ? Number(fees) : 0,
@@ -245,7 +246,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
             axios
                 .post(`${import.meta.env.VITE_API_URI}/accessoriesSold`, {
                     name: seletedAccessories?.name,
-                    soldValue: Number(value.replace('R$: ', '')),
+                    soldValue: Number(formattValue(value)),
                     type: seletedAccessories?.type,
                     formPayment: personName,
                     quantity: Number(quantity),
@@ -311,7 +312,7 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                 email: email ? email : 'renatonunes0011@gmail.com',
                 cpf: cpf,
                 name: nameClient,
-                value: value.replace('R$: ', ''),
+                value: formattValue(value),
                 phone: phone,
                 cep: cep,
                 state: state,
@@ -392,16 +393,34 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         </Select>
                     </FormControl>
                 </Box>
-                <InputMask
-                    mask="R$: 99999"
-                    maskPlaceholder={null}
+
+                <TextField
+                    fullWidth
+                    type="text"
+                    id="outlined-basic"
+                    label="Valor da tarifa"
+                    variant="outlined"
+                    error={errorFees}
+                    helperText={errorFees ? 'Valor com no máximo 2 casas decimais!' : undefined}
                     value={fees}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        const regex = /^[0-9.,]*$/
+                        if (!regex.test(event.target.value)) {
+                            return ''
+                        }
                         setFees(event.target.value)
                     }}
-                >
-                    <TextField fullWidth id="outlined-basic" label="Valor da tarifa" variant="outlined" />
-                </InputMask>
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
+                    }}
+                    onBlur={() => {
+                        if (countDecimalPlaces(formattValue(fees)) > 2) {
+                            setErrorFees(true)
+                        } else {
+                            setErrorFees(false)
+                        }
+                    }}
+                />
 
                 {productType === 'Device' ? (
                     <Box sx={{ minWidth: '200px', width: '100%' }}>
@@ -441,24 +460,33 @@ export default function SoldProduct({ productType }: InsertProductProps) {
 
                 <TextField
                     fullWidth
-                    type="number"
+                    type="text"
                     id="outlined-basic"
                     label="Valor do produto"
                     variant="outlined"
-                    error={countDecimalPlaces(value) > 2 ? true : false}
-                    helperText={countDecimalPlaces(value) > 2 ? 'Valor com no máximo 2 casas decimais!' : undefined}
+                    error={errorValue}
+                    helperText={errorValue ? 'Valor com no máximo 2 casas decimais!' : undefined}
                     value={value}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        const regex = /^[0-9.,]*$/
+                        if (!regex.test(event.target.value)) {
+                            return ''
+                        }
                         setValue(event.target.value)
                     }}
                     onBlur={() => {
-                        if (Number(value.replace('R$: ', '')) < minValue!) {
-                            setValue('')
-                            setOpen(true)
-                            setMessage(`Valor do produto é no mínimo R$${minValue} !`)
-                            setTimeout(() => {
-                                setOpen(false)
-                            }, 2000)
+                        if (countDecimalPlaces(formattValue(value)) > 2) {
+                            setErrorValue(true)
+                        } else {
+                            setErrorValue(false)
+                            if (Number(Number(formattValue(value))) < minValue!) {
+                                setValue('')
+                                setOpen(true)
+                                setMessage(`Valor do produto é no mínimo R$${minValue} !`)
+                                setTimeout(() => {
+                                    setOpen(false)
+                                }, 2000)
+                            }
                         }
                     }}
                     InputProps={{

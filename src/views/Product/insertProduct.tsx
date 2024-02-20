@@ -6,6 +6,7 @@ import { useMedia } from '../../hooks/mediaQueryHook'
 import InputMask from 'react-input-mask'
 import Loading from '../../components/Loading'
 import { countDecimalPlaces } from '../../utils/countDecimalPlaces'
+import { formattValue } from '../../utils/formattValue'
 
 type InsertProductProps = {
     productType: string
@@ -28,6 +29,9 @@ export default function InsertProduct({ productType }: InsertProductProps) {
     const [supplier, setSupplier] = useState<string>('')
     const [maxDiscountAmout, setMaxDiscountAmout] = useState<string>('')
     const [check, setCheck] = useState<boolean>(false)
+    const [errorIn, setErrorIn] = useState<boolean>(false)
+    const [errorOut, setErrorOut] = useState<boolean>(false)
+    const [errorDiscount, setErrorDiscount] = useState<boolean>(false)
 
     const insertProduct = () => {
         setFinish(false)
@@ -36,15 +40,15 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                 axios
                     .post(`${import.meta.env.VITE_API_URI}/device`, {
                         name: nameDevice,
-                        inputValue: Number(value.replace('R$: ', '')),
-                        outputValue: Number(outputValue.replace('R$: ', '')),
+                        inputValue: Number(formattValue(value)),
+                        outputValue: Number(formattValue(outputValue)),
                         color: color,
                         supplier: supplier,
                         type: type,
                         seriesNumber: seriesNumber,
                         status: status,
                         stateBattery: stateBattery,
-                        maxDiscountAmout: maxDiscountAmout ? Number(maxDiscountAmout.replace('R$: ', '')) : 0,
+                        maxDiscountAmout: maxDiscountAmout ? Number(maxDiscountAmout.replace(/,/g, '.')) : 0,
                     })
                     .then((res) => {
                         setMessage(res.data), setOpen(true)
@@ -129,43 +133,63 @@ export default function InsertProduct({ productType }: InsertProductProps) {
 
                 <TextField
                     fullWidth
-                    type="number"
+                    type="text"
                     id="outlined-basic"
                     label="Valor de entrada"
                     variant="outlined"
-                    error={countDecimalPlaces(value) > 2 ? true : false}
-                    helperText={countDecimalPlaces(value) > 2 ? 'Valor com no máximo 2 casas decimais!' : undefined}
+                    error={errorIn}
+                    helperText={errorIn ? 'Valor com no máximo 2 casas decimais!' : undefined}
                     value={value}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        const regex = /^[0-9.,]*$/
+                        if (!regex.test(event.target.value)) {
+                            return ''
+                        }
                         setValue(event.target.value)
                     }}
                     InputProps={{
                         startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
                     }}
+                    onBlur={() => {
+                        if (countDecimalPlaces(formattValue(value)) > 2) {
+                            setErrorIn(true)
+                        } else {
+                            setErrorIn(false)
+                        }
+                    }}
                 />
                 <TextField
                     fullWidth
-                    type="number"
+                    type="text"
                     id="outlined-basic"
                     label="Valor de saída"
                     variant="outlined"
-                    error={countDecimalPlaces(outputValue) > 2 ? true : false}
-                    helperText={countDecimalPlaces(outputValue) > 2 ? 'Valor com no máximo 2 casas decimais!' : undefined}
+                    error={errorOut ? true : false}
+                    helperText={errorOut ? 'Valor com no máximo 2 casas decimais!' : undefined}
                     value={outputValue}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setOutputValue(event.target.value.toUpperCase())
+                        const regex = /^[0-9.,]*$/
+                        if (!regex.test(event.target.value)) {
+                            return ''
+                        }
+                        setOutputValue(event.target.value)
                     }}
                     InputProps={{
                         startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
                     }}
                     onBlur={() => {
-                        if (Number(outputValue.replace('R$: ', '')) < Number(value.replace('R$: ', ''))) {
-                            setMessage('Valor de saída deve ser maior que o valor de entrada!')
-                            setOpen(true)
-                            setOutputValue('')
-                            setTimeout(() => {
-                                setOpen(false)
-                            }, 2000)
+                        if (countDecimalPlaces(formattValue(outputValue)) > 2) {
+                            setErrorOut(true)
+                        } else {
+                            setErrorOut(false)
+                            if (Number(formattValue(outputValue)) < Number(formattValue(value))) {
+                                setMessage('Valor de saída deve ser maior que o valor de entrada!')
+                                setOpen(true)
+                                setOutputValue('')
+                                setTimeout(() => {
+                                    setOpen(false)
+                                }, 2000)
+                            }
                         }
                     }}
                 />
@@ -247,16 +271,39 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         setSupplier(event.target.value.toUpperCase())
                     }}
                 />
-                <InputMask
-                    mask="R$: 99999"
-                    maskPlaceholder={null}
+
+                <TextField
+                    fullWidth
+                    type="text"
+                    error={errorDiscount ? true : false}
+                    helperText={errorDiscount ? 'Valor com no máximo 2 casas decimais!' : undefined}
+                    id="outlined-basic"
+                    label="Desconto máximo"
+                    variant="outlined"
                     value={maxDiscountAmout}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setMaxDiscountAmout(event.target.value.toUpperCase())
+                        const regex = /^[0-9.,]*$/
+                        if (!regex.test(event.target.value)) {
+                            return ''
+                        }
+                        setMaxDiscountAmout(event.target.value)
                     }}
-                >
-                    <TextField fullWidth id="outlined-basic" label="Desconto máximo" variant="outlined" />
-                </InputMask>
+                    onBlur={() => {
+                        if (countDecimalPlaces(formattValue(maxDiscountAmout)) > 2) {
+                            setErrorDiscount(true)
+                        } else {
+                            setErrorDiscount(false)
+                            if (Number(formattValue(outputValue)) < Number(formattValue(maxDiscountAmout))) {
+                                setMessage('Valor de saída deve ser maior que o valor de entrada!')
+                                setOpen(true)
+                                setMaxDiscountAmout('')
+                                setTimeout(() => {
+                                    setOpen(false)
+                                }, 2000)
+                            }
+                        }
+                    }}
+                />
             </Grid>
             <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
                 <TextField
