@@ -1,8 +1,6 @@
-export function formattValue(number: string) {
-    let value = number.replace(/,/g, '.')
-    const pontoIndex = value.indexOf('.')
-    if (pontoIndex !== -1 && value.indexOf('.', pontoIndex + 1) !== -1) {
-        value = value.replace('.', '')
-    }
-    return value
+export function formattValue(value: string): string {
+    const newValor = value.slice(2)
+    const partes = newValor.split(',').map((parte) => parte.replace('.', ''))
+    const result = partes.join('.')
+    return result
 }
