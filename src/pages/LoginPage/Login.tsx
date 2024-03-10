@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react'
-import Logo from '../../assets/Logo.png'
-import LogoMobile from '../../assets/LogoWhite.png'
+import Logo from '../../assets/logo.svg'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import imgBackground from '../../assets/AppleMac.png'
+import imgBackground from '../../assets/image.png'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ErrorIcon from '@mui/icons-material/Error'
 import './style.css'
@@ -79,7 +78,7 @@ export const Login: React.FC = () => {
             {!finish && <Loading />}
             <div className={isMobile ? 'containerLoginMobile' : 'containerLogin'}>
                 <form className={isMobile ? 'formStyleMobile' : 'formStyle'}>
-                    <img src={isMobile ? LogoMobile : Logo} style={{ marginBottom: '80px' }} />
+                    <img src={Logo} style={{ width: '200px', marginBottom: '80px' }} />
                     <div className={isMobile ? 'usernameStyleMobile' : 'usernameStyle'}>
                         <input
                             required
