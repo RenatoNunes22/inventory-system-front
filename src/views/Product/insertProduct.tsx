@@ -7,6 +7,8 @@ import InputMask from 'react-input-mask'
 import Loading from '../../components/Loading'
 import { countDecimalPlaces } from '../../utils/countDecimalPlaces'
 import { formattValue } from '../../utils/formattValue'
+import { NumericFormat } from 'react-number-format'
+import './style.css'
 
 type InsertProductProps = {
     productType: string
@@ -29,9 +31,38 @@ export default function InsertProduct({ productType }: InsertProductProps) {
     const [supplier, setSupplier] = useState<string>('')
     const [maxDiscountAmout, setMaxDiscountAmout] = useState<string>('')
     const [check, setCheck] = useState<boolean>(false)
-    const [errorIn, setErrorIn] = useState<boolean>(false)
-    const [errorOut, setErrorOut] = useState<boolean>(false)
     const [errorDiscount, setErrorDiscount] = useState<boolean>(false)
+    const [focusIn, setFocusIn] = useState<boolean>(false)
+    const [focusOut, setFocusOut] = useState<boolean>(false)
+
+    const borderColor = '#c4c4c4'
+    const borderColorFocus = '#102bc0'
+    const backgroundColor = '#ffffff'
+    const fontSize = '16px'
+    const height = '55px'
+    const width = isMobile ? '100%' : '95%'
+
+    const styleEntry = {
+        border: `${focusIn ? 2 : 1}px solid ${focusIn ? borderColorFocus : borderColor}`,
+        borderRadius: '4px',
+        backgroundColor,
+        color: '#000000',
+        padding: '5px 15px',
+        fontSize,
+        height,
+        width,
+    }
+
+    const styleExit = {
+        border: `${focusOut ? 2 : 1}px solid ${focusOut ? borderColorFocus : borderColor}`,
+        borderRadius: '4px',
+        backgroundColor,
+        padding: '5px 15px',
+        color: '#000000',
+        fontSize,
+        height,
+        width,
+    }
 
     const insertProduct = () => {
         setFinish(false)
@@ -99,6 +130,18 @@ export default function InsertProduct({ productType }: InsertProductProps) {
         }
     }
 
+    const BlueCheckValue = () => {
+        setFocusOut(false)
+        if (Number(formattValue(outputValue)) < Number(formattValue(value))) {
+            setMessage('Valor de saída deve ser maior que o valor de entrada!')
+            setOpen(true)
+            setOutputValue('')
+            setTimeout(() => {
+                setOpen(false)
+            }, 2000)
+        }
+    }
+
     useEffect(() => {
         if (productType === 'Device' && nameDevice && value && seriesNumber) {
             setCheck(true)
@@ -130,67 +173,34 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                         setNameDevice(event.target.value.toUpperCase())
                     }}
                 />
-
-                <TextField
-                    fullWidth
-                    type="text"
-                    id="outlined-basic"
-                    label="Valor de entrada"
-                    variant="outlined"
-                    error={errorIn}
-                    helperText={errorIn ? 'Valor com no máximo 2 casas decimais!' : undefined}
+                <NumericFormat
+                    style={styleEntry}
                     value={value}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        const regex = /^[0-9.,]*$/
-                        if (!regex.test(event.target.value)) {
-                            return ''
-                        }
-                        setValue(event.target.value)
-                    }}
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
-                    }}
-                    onBlur={() => {
-                        if (countDecimalPlaces(formattValue(value)) > 2) {
-                            setErrorIn(true)
-                        } else {
-                            setErrorIn(false)
-                        }
+                    thousandSeparator="."
+                    onFocus={() => setFocusIn(true)}
+                    onBlur={() => setFocusIn(false)}
+                    decimalSeparator=","
+                    decimalScale={2}
+                    prefix="R$ "
+                    placeholder="Valor de entrada"
+                    allowNegative={false}
+                    onValueChange={(values) => {
+                        setValue(values.formattedValue)
                     }}
                 />
-                <TextField
-                    fullWidth
-                    type="text"
-                    id="outlined-basic"
-                    label="Valor de saída"
-                    variant="outlined"
-                    error={errorOut ? true : false}
-                    helperText={errorOut ? 'Valor com no máximo 2 casas decimais!' : undefined}
+                <NumericFormat
+                    style={styleExit}
                     value={outputValue}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        const regex = /^[0-9.,]*$/
-                        if (!regex.test(event.target.value)) {
-                            return ''
-                        }
-                        setOutputValue(event.target.value)
-                    }}
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
-                    }}
-                    onBlur={() => {
-                        if (countDecimalPlaces(formattValue(outputValue)) > 2) {
-                            setErrorOut(true)
-                        } else {
-                            setErrorOut(false)
-                            if (Number(formattValue(outputValue)) < Number(formattValue(value))) {
-                                setMessage('Valor de saída deve ser maior que o valor de entrada!')
-                                setOpen(true)
-                                setOutputValue('')
-                                setTimeout(() => {
-                                    setOpen(false)
-                                }, 2000)
-                            }
-                        }
+                    thousandSeparator="."
+                    onFocus={() => setFocusOut(true)}
+                    onBlur={BlueCheckValue}
+                    decimalSeparator=","
+                    decimalScale={2}
+                    prefix="R$ "
+                    placeholder="Valor de saída"
+                    allowNegative={false}
+                    onValueChange={(values) => {
+                        setOutputValue(values.formattedValue)
                     }}
                 />
             </Grid>
