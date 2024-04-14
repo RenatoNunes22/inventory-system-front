@@ -2,136 +2,70 @@ import * as React from 'react'
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import axios from 'axios'
-import { Device } from '../../model/Device'
 import { formatarData } from '../../utils/formatterData'
 import { convertDate } from '../../utils/convertDate'
-import { Accessories } from '../../model/Accessories'
+import { Product } from '../../model/Product'
 import Snackbars from '../../components/SnackBar'
 import { useMedia } from '../../hooks/mediaQueryHook'
 
-type UpdateProductProps = {
-    productType: string
-}
-
-export default function UpdateProduct({ productType }: UpdateProductProps) {
+export default function UpdateProduct() {
     const isMobile = useMedia('(max-width: 850px)')
-    const [listDevice, setListDevice] = React.useState<Device[]>()
-    const [listAccessories, setListAccessories] = React.useState<Accessories[]>()
+    const [listProduct, setListProduct] = React.useState<Product[]>()
     const [search, setSearch] = React.useState<number | string>('')
-    const [device, setDevice] = React.useState<Device>()
-    const [accessories, setAccessories] = React.useState<Accessories>()
+    const [product, setProduct] = React.useState<Product>()
     const [newNameProduct, setNewNameProduct] = React.useState<string | undefined>()
     const [newValueProduct, setNewValueProduct] = React.useState<string | undefined>()
-    const [newTypeProduct, setNewTypeProduct] = React.useState<string | undefined>()
-    const [newSeriesNumberProduct, setNewSeriesNumberProduct] = React.useState<string | undefined>()
     const [newStatusProduct, setNewStatusProduct] = React.useState<string | undefined>()
-    const [newStateBatteryProduct, setNewStateBatteryProduct] = React.useState<string | undefined>()
-    const [newMaxDiscountAmoutProduct, setNewMaxDiscountAmoutProduct] = React.useState<string | undefined>()
     const [newCreatedAtProduct, setNewCreatedAtProduct] = React.useState<string | undefined>()
     const [newQuantityProduct, setNewQuantityProduct] = React.useState<string | undefined>()
     const [message, setMessage] = React.useState<string>('')
     const [open, setOpen] = React.useState(false)
 
     React.useEffect(() => {
-        setDevice(undefined)
-        setAccessories(undefined)
+        setProduct(undefined)
     }, [search])
 
     const searchProduct = () => {
-        if (productType === 'Device') {
-            axios
-                .get(`${import.meta.env.VITE_API_URI}/devices/${search}`)
-                .then((res) => setDataDevice(res.data[0]))
-                .catch((err) => console.log(err))
-        } else {
-            axios
-                .get(`${import.meta.env.VITE_API_URI}/accessories/${search}`)
-                .then((res) => setDataAccessories(res.data[0]))
-                .catch((err) => console.log(err))
-        }
+        axios
+            .get(`${import.meta.env.VITE_API_URI}/product/${search}`)
+            .then((res) => setDataProduct(res.data[0]))
+            .catch((err) => console.log(err))
     }
 
-    const setDataDevice = (device: Device) => {
-        setDevice(device)
-        setNewNameProduct(device.name)
-        setNewValueProduct(String(device.inputValue))
-        setNewTypeProduct(device.type)
-        setNewStatusProduct(device.status)
-        setNewMaxDiscountAmoutProduct(String(device.maxDiscountAmout))
-        setNewCreatedAtProduct(formatarData(device.createdAt))
-        setNewSeriesNumberProduct(device.seriesNumber)
-        setNewStateBatteryProduct(String(device.stateBattery))
-    }
-
-    const setDataAccessories = (accessories: Accessories) => {
-        setAccessories(accessories)
-        setNewNameProduct(accessories.name)
-        setNewValueProduct(String(accessories.inputValue))
-        setNewTypeProduct(accessories.type)
-        setNewStatusProduct(accessories.status)
-        setNewMaxDiscountAmoutProduct(String(accessories.maxDiscountAmout))
-        setNewCreatedAtProduct(formatarData(accessories.createdAt))
-        setNewQuantityProduct(String(accessories.quantity))
+    const setDataProduct = (product: Product) => {
+        setProduct(product)
+        setNewNameProduct(product.name)
+        setNewValueProduct(String(product.inputValue))
+        setNewStatusProduct(product.status)
+        setNewCreatedAtProduct(formatarData(product.createdAt))
+        setNewQuantityProduct(String(product.quantity))
     }
 
     React.useEffect(() => {
-        if (productType === 'Device') {
-            axios.get(`${import.meta.env.VITE_API_URI}/devices/`).then((res) => {
-                setListDevice(res.data)
-            })
-        } else if (productType === 'Accessories') {
-            axios.get(`${import.meta.env.VITE_API_URI}/accessories/`).then((res) => {
-                setListAccessories(res.data)
-            })
-        }
-    }, [productType, open])
+        axios.get(`${import.meta.env.VITE_API_URI}/product/`).then((res) => {
+            setListProduct(res.data)
+        })
+    }, [open])
 
     const handleChange = (event: SelectChangeEvent) => {
         setSearch(event.target.value)
     }
 
-    const updateDevice = () => {
-        if (device) {
+    const updateProduct = () => {
+        if (product) {
             axios
-                .put(`${import.meta.env.VITE_API_URI}/devices/${device.seriesNumber}`, {
-                    name: newNameProduct ? newNameProduct : device.name,
-                    value: newValueProduct ? newValueProduct : device.inputValue,
-                    type: newTypeProduct ? newTypeProduct : device.type,
-                    seriesNumber: newSeriesNumberProduct ? newSeriesNumberProduct : device.seriesNumber,
-                    status: newStatusProduct ? newStatusProduct : device.status,
-                    stateBattery: newStateBatteryProduct ? newStateBatteryProduct : device.stateBattery,
-                    maxDiscountAmout: newMaxDiscountAmoutProduct ? newMaxDiscountAmoutProduct : device.maxDiscountAmout,
-                    createdAt: newCreatedAtProduct ? convertDate(newCreatedAtProduct) : device.createdAt,
+                .put(`${import.meta.env.VITE_API_URI}/product/${product?.name}`, {
+                    name: newNameProduct ? newNameProduct : product.name,
+                    value: newValueProduct ? newValueProduct : product.inputValue,
+                    quantity: newQuantityProduct ? newQuantityProduct : product.quantity,
+                    status: newStatusProduct ? newStatusProduct : product.status,
+                    createdAt: newCreatedAtProduct ? convertDate(newCreatedAtProduct) : product.createdAt,
                 })
                 .then((res) => {
                     setMessage(res.data)
                     setOpen(true)
                     setTimeout(() => {
-                        setDevice(undefined)
-                        setOpen(false)
-                    }, 2000)
-                })
-                .catch((err) => console.log(err))
-        }
-    }
-
-    const updateAccessories = () => {
-        if (accessories) {
-            axios
-                .put(`${import.meta.env.VITE_API_URI}/accessories/${accessories?.name}`, {
-                    name: newNameProduct ? newNameProduct : accessories.name,
-                    value: newValueProduct ? newValueProduct : accessories.inputValue,
-                    type: newTypeProduct ? newTypeProduct : accessories.type,
-                    quantity: newQuantityProduct ? newQuantityProduct : accessories.quantity,
-                    status: newStatusProduct ? newStatusProduct : accessories.status,
-                    maxDiscountAmout: newMaxDiscountAmoutProduct ? newMaxDiscountAmoutProduct : accessories.maxDiscountAmout,
-                    createdAt: newCreatedAtProduct ? convertDate(newCreatedAtProduct) : accessories.createdAt,
-                })
-                .then((res) => {
-                    setMessage(res.data)
-                    setOpen(true)
-                    setTimeout(() => {
-                        setAccessories(undefined)
+                        setProduct(undefined)
                         setOpen(false)
                     }, 2000)
                 })
@@ -181,13 +115,9 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                             label="Selecione o produto"
                             onChange={handleChange}
                         >
-                            {productType === 'Device'
-                                ? listDevice?.map((device: Device) => (
-                                      <MenuItem value={device.seriesNumber}>{`${device.name} - ${device.seriesNumber}`}</MenuItem>
-                                  ))
-                                : listAccessories?.map((accessories: Accessories) => (
-                                      <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
-                                  ))}
+                            {listProduct?.map((product: Product) => (
+                                <MenuItem value={product.name}>{product.name}</MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                     <Button
@@ -204,7 +134,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                     </Button>
                 </Box>
             </Grid>
-            {(device || accessories) && (
+            {product && (
                 <Grid
                     item
                     display={'flex'}
@@ -247,16 +177,6 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                                 setNewValueProduct(event.target.value)
                             }}
                         />
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Tipo do produto"
-                            variant="outlined"
-                            value={newTypeProduct}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setNewTypeProduct(event.target.value)
-                            }}
-                        />
                     </Grid>
                     <Grid
                         item
@@ -270,50 +190,14 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                         gap={2}
                         width={'100%'}
                     >
-                        {productType === 'Device' ? (
-                            <>
-                                <TextField
-                                    fullWidth
-                                    id="outlined-basic"
-                                    label="Numero de série"
-                                    variant="outlined"
-                                    value={newSeriesNumberProduct}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setNewSeriesNumberProduct(event.target.value)
-                                    }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    id="outlined-basic"
-                                    label="Estado da bateria"
-                                    variant="outlined"
-                                    value={newStateBatteryProduct}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setNewStateBatteryProduct(event.target.value)
-                                    }}
-                                />{' '}
-                            </>
-                        ) : (
-                            <TextField
-                                fullWidth
-                                id="outlined-basic"
-                                label="Quantidade de produto"
-                                variant="outlined"
-                                value={newQuantityProduct}
-                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                    setNewQuantityProduct(event.target.value)
-                                }}
-                            />
-                        )}
-
                         <TextField
                             fullWidth
                             id="outlined-basic"
-                            label="Desconto Máximo"
+                            label="Quantidade de produto"
                             variant="outlined"
-                            value={newMaxDiscountAmoutProduct}
+                            value={newQuantityProduct}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setNewMaxDiscountAmoutProduct(event.target.value)
+                                setNewQuantityProduct(event.target.value)
                             }}
                         />
                     </Grid>
@@ -354,7 +238,7 @@ export default function UpdateProduct({ productType }: UpdateProductProps) {
                     <Grid item display={'flex'} justifyContent={isMobile ? 'center' : 'end'} width={'100%'}>
                         <Button
                             variant="contained"
-                            onClick={productType === 'Device' ? updateDevice : updateAccessories}
+                            onClick={updateProduct}
                             sx={{
                                 width: isMobile ? '100%' : '200px',
                                 backgroundColor: '#5e6464',

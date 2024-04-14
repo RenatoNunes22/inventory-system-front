@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react'
-import Logo from '../../assets/logo.svg'
+import Logo from '../../assets/text-logo.png'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
-import imgBackground from '../../assets/image.png'
+import imgBackground from '../../assets/the_brothers.png'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ErrorIcon from '@mui/icons-material/Error'
 import './style.css'
@@ -50,11 +50,7 @@ export const Login: React.FC = () => {
                     setToken(response.data.token)
                     setRole(response.data.role)
                     setSuccess('Login efetuado com sucesso')
-                    if (response.data.role === 1) {
-                        navigate('/Inventory')
-                    } else {
-                        navigate('/Sold')
-                    }
+                    navigate('/System')
                 } else {
                     setSuccess('Usuário ou senha incorretos')
                 }
@@ -78,7 +74,7 @@ export const Login: React.FC = () => {
             {!finish && <Loading />}
             <div className={isMobile ? 'containerLoginMobile' : 'containerLogin'}>
                 <form className={isMobile ? 'formStyleMobile' : 'formStyle'}>
-                    <img src={Logo} style={{ width: '200px', marginBottom: '80px' }} />
+                    <img src={Logo} style={{ width: '350px', marginBottom: '50px' }} />
                     <div className={isMobile ? 'usernameStyleMobile' : 'usernameStyle'}>
                         <input
                             required

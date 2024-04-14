@@ -1,0 +1,25 @@
+.button {
+  position: relative;
+  overflow: hidden;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color:#FFF;
+  transition: width 0.5s ease; /* Adiciona uma transição de largura de 0.5 segundos */
+}
+
+.button:hover::before {
+  width: 100%;
+}
+
+.button.clicado::before {
+  width: 100%;
+  transition: none; /* Remova a transição para tornar a borda estática após o clique */
+}
+  

@@ -1,10 +1,6 @@
-/* eslint-disable @typescript-eslint/prefer-as-const */
-import { Button, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup } from '@mui/material'
+import { Button, Grid } from '@mui/material'
 import './style.css'
 import { useEffect, useState } from 'react'
-
-import ViewStockDevice from '../../views/Product/viewStockDevice'
-import ViewStockAccesories from '../../views/Product/viewStockAccessories'
 import UpdateProduct from '../../views/Product/updateProduct'
 import DeleteProduct from '../../views/Product/deleteProduct'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -14,10 +10,10 @@ import AddIcon from '@mui/icons-material/Add'
 import InsertProduct from '../../views/Product/insertProduct'
 import { useMedia } from '../../hooks/mediaQueryHook'
 import { useNavigate } from 'react-router-dom'
+import ViewStockProduct from '../../views/Product/viewStockProduct'
 
 export const Inventory: React.FC = () => {
     const [controlButton, setControlButton] = useState<'insert' | 'delete' | 'red' | 'update'>('insert')
-    const [productType, setProductType] = useState<string>('Device')
     const isMobile = useMedia('(max-width: 600px)')
     const switchName = useMedia('(max-width: 850px)')
     const access = localStorage.getItem('role')
@@ -33,21 +29,8 @@ export const Inventory: React.FC = () => {
         }
     }, [])
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setProductType((event.target as HTMLInputElement).value)
-    }
-
     return (
-        <Grid
-            container={true}
-            display={'flex'}
-            direction={'row'}
-            alignItems={'center'}
-            justifyContent={'start'}
-            xs={12}
-            lg={12}
-            xl={12}
-        >
+        <Grid container={true} display={'flex'} direction={'row'} alignItems={'center'} justifyContent={'start'} xs={12} lg={12} xl={12}>
             <Grid
                 container={true}
                 display={'flex'}
@@ -167,40 +150,10 @@ export const Inventory: React.FC = () => {
                                 boxShadow: '5px 5px 30px 0px rgba(0, 0, 0, 0.30)',
                             }}
                         >
-                            <FormControl
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <FormLabel color="primary" id="demo-row-radio-buttons-group-label">
-                                    Selecione o tipo do produto
-                                </FormLabel>
-
-                                <RadioGroup
-                                    row
-                                    aria-labelledby="demo-row-radio-buttons-group-label"
-                                    name="row-radio-buttons-group"
-                                    value={productType}
-                                    onChange={handleChange}
-                                >
-                                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                        <FormControlLabel
-                                            value="Device"
-                                            control={<Radio defaultChecked={true} />}
-                                            label="Aparelhos"
-                                        />
-                                        <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
-                                    </div>
-                                </RadioGroup>
-                            </FormControl>
-                            {controlButton === 'insert' && <InsertProduct productType={productType} />}
-                            {controlButton === 'red' && productType === 'Device' && <ViewStockDevice />}
-                            {controlButton === 'red' && productType === 'Accessories' && <ViewStockAccesories />}
-                            {controlButton === 'update' && <UpdateProduct productType={productType} />}
-                            {controlButton === 'delete' && <DeleteProduct productType={productType} />}
+                            {controlButton === 'insert' && <InsertProduct />}
+                            {controlButton === 'red' && <ViewStockProduct />}
+                            {controlButton === 'update' && <UpdateProduct />}
+                            {controlButton === 'delete' && <DeleteProduct />}
                         </div>
                     </div>
                 </Grid>

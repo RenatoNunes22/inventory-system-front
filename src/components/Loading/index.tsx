@@ -1,4 +1,4 @@
-import LogoSingle from '../../assets/logo.svg'
+import LogoSingle from '../../assets/the_brothers.png'
 
 import './style.css'
 

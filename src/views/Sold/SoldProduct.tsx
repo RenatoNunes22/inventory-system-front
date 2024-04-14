@@ -16,8 +16,6 @@ import {
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import Snackbars from '../../components/SnackBar'
-import { Accessories } from '../../model/Accessories'
-import { Device } from '../../model/Device'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import { Client } from '../../model/Client'
 import InputMask from 'react-input-mask'
@@ -25,10 +23,7 @@ import { useMedia } from '../../hooks/mediaQueryHook'
 import Loading from '../../components/Loading'
 import { countDecimalPlaces } from '../../utils/countDecimalPlaces'
 import { formattValue } from '../../utils/formattValue'
-
-type InsertProductProps = {
-    productType: string
-}
+import { Product } from '../../model/Product'
 
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
@@ -41,26 +36,18 @@ const MenuProps = {
     },
 }
 
-export default function SoldProduct({ productType }: InsertProductProps) {
+export default function SoldProduct() {
     const isMobile = useMedia('(max-width: 1220px)')
-    const user = localStorage.getItem('user')?.replace(/"/g, '')
     const [finish, setFinish] = useState(true)
-    const [listDevice, setListDevice] = useState<Device[]>()
-    const [listAccessories, setListAccessories] = useState<Array<string>>()
+    const [listProduct, setListProduct] = useState<Array<string>>()
     const [search, setSearch] = useState<number | string>('')
-    const [seletedDevice, setSeletedDevice] = useState<Device>()
-    const [seletedAccessories, setSeletedAccessories] = useState<Accessories>()
-    const [seletedClient, setSeletedClient] = useState<Client>()
-    const [gift, setGift] = useState<string[]>([])
-    const [minValue, setMinValue] = useState<number>()
+    const [seletedProduct, setSeletedProduct] = useState<Product>()
     const [errorValue, setErrorValue] = useState<boolean>(false)
-    const [errorFees, setErrorFees] = useState<boolean>(false)
 
     //CLIENT
     const [selectedClient, setSelectedClient] = useState<Client>()
     const [nameClient, setNameClient] = useState('')
     const [email, setEmail] = useState<string>('')
-    const [fees, setFees] = useState<string>('')
     const [cpf, setCPF] = useState<string>('')
     const [dn, setDn] = useState<string>('')
     const [phone, setPhone] = useState<string>('')
@@ -94,21 +81,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
         } = event
         setPersonName(typeof value === 'string' ? value.split(',') : value)
     }
-
-    const handleChangeGift = (event: SelectChangeEvent<typeof gift>) => {
-        const {
-            target: { value },
-        } = event
-        setGift(typeof value === 'string' ? value.split(',') : value)
-    }
-
-    useEffect(() => {
-        if (productType === 'Device' && seletedDevice) {
-            setMinValue(seletedDevice?.outputValue - seletedDevice?.maxDiscountAmout)
-        } else if (productType === 'Accessories' && seletedAccessories) {
-            setMinValue((seletedAccessories?.outputValue - seletedAccessories?.maxDiscountAmout) * Number(quantity))
-        }
-    }, [seletedDevice, seletedAccessories, quantity, productType])
 
     useEffect(() => {
         const newCEP = cep.replace(caracteresARemover, '')
@@ -159,119 +131,58 @@ export default function SoldProduct({ productType }: InsertProductProps) {
 
     useEffect(() => {
         setFinish(false)
-        Promise.all([axios.get(`${import.meta.env.VITE_API_URI}/devices/`), axios.get(`${import.meta.env.VITE_API_URI}/accessories/`)])
+        axios
+            .get(`${import.meta.env.VITE_API_URI}/product/`)
             .then((res) => {
-                setListDevice(res[0].data)
-                const listItems = res[1].data.map((item: Accessories) => item.name)
-                setListAccessories(listItems)
+                setListProduct(res.data)
             })
             .finally(() => {
                 setFinish(true)
             })
-    }, [productType, open])
+    }, [open])
 
     useEffect(() => {
-        if (search) {
-            if (productType === 'Device') {
-                axios.get(`${import.meta.env.VITE_API_URI}/devices/${search}`).then((res) => {
-                    setSeletedDevice(res.data[0])
-                })
-            } else if (productType === 'Accessories') {
-                axios.get(`${import.meta.env.VITE_API_URI}/accessories/${search}`).then((res) => {
-                    setSeletedAccessories(res.data[0])
-                })
-            }
-        }
+        axios.get(`${import.meta.env.VITE_API_URI}/product/${search}`).then((res) => {
+            setSeletedProduct(res.data[0])
+        })
     }, [search])
 
     useEffect(() => {
-        setSeletedDevice({} as Device)
-        setSeletedAccessories({} as Accessories)
-        setSeletedClient({} as Client)
-    }, [productType])
-
-    useEffect(() => {
-        if (seletedDevice || seletedAccessories) {
+        if (seletedProduct) {
             setCheck(true)
         } else {
             setCheck(false)
         }
-    }, [seletedDevice, seletedAccessories])
+    }, [seletedProduct])
 
     const soldProduct = () => {
         setFinish(false)
-        if (selectedClient === undefined || productType === 'Device') {
-            axios.post(`${import.meta.env.VITE_API_URI}/clients`, {
-                email: email,
-                cpf: cpf,
-                name: nameClient,
-                dn: dn,
-                telephone: phone,
-                cep: cep,
-                state: state,
-                city: city,
-                neighborhood: neighborhood,
-                street: street,
-                number: number,
-                complement: complement,
-                products: [],
+        axios
+            .post(`${import.meta.env.VITE_API_URI}/product`, {
+                name: seletedProduct?.name,
+                soldValue: Number(formattValue(value)),
+                formPayment: personName,
+                quantity: Number(quantity),
+                status: seletedProduct?.status,
+                payment: personName,
             })
-        }
-        if (productType === 'Device') {
-            axios
-                .post(`${import.meta.env.VITE_API_URI}/deviceSold/${search}`, {
-                    soldValue: Number(formattValue(value)),
-                    seriesNumber: seletedDevice?.seriesNumber,
-                    expenses: 0,
-                    fees: fees && !isNaN(Number(fees)) ? Number(fees) : 0,
-                    formPayment: personName,
-                    client: cpf,
-                    seller: user,
-                    gift: gift,
+            .then((res) => {
+                setMessage(res.data)
+                setOpen(true)
+                if (res.data === 'Produto vendido com sucesso!') {
+                    clearState()
+                }
+            })
+            .finally(() => {
+                setFinish(true)
+                setTimeout(() => {
+                    setOpen(false)
                 })
-                .then((res) => {
-                    setMessage(res.data)
-                    setOpen(true)
-                    if (res.data === 'Aparelho vendido com sucesso!') {
-                        clearState()
-                    }
-                })
-                .finally(() => {
-                    setFinish(true)
-                    setTimeout(() => {
-                        setOpen(false)
-                    }, 2000)
-                })
-        } else if (productType === 'Accessories') {
-            axios
-                .post(`${import.meta.env.VITE_API_URI}/accessoriesSold`, {
-                    name: seletedAccessories?.name,
-                    soldValue: Number(formattValue(value)),
-                    type: seletedAccessories?.type,
-                    formPayment: personName,
-                    quantity: Number(quantity),
-                    status: seletedAccessories?.status,
-                    maxDiscountAmout: seletedAccessories?.maxDiscountAmout,
-                    payment: personName,
-                })
-                .then((res) => {
-                    setMessage(res.data)
-                    setOpen(true)
-                    if (res.data === 'Acessório vendido com sucesso!') {
-                        clearState()
-                    }
-                })
-                .finally(() => {
-                    setFinish(true)
-                    setTimeout(() => {
-                        setOpen(false)
-                    })
-                })
-        }
+            })
     }
 
     const checkMessage = () => {
-        if (message === 'Aparelho vendido com sucesso!' || message === 'Acessório vendido com sucesso!') {
+        if (message === 'Produto vendido com sucesso!') {
             return true
         } else {
             return false
@@ -279,61 +190,26 @@ export default function SoldProduct({ productType }: InsertProductProps) {
     }
 
     const clearState = () => {
-        if (productType === 'Device') {
-            setSeletedDevice(undefined)
-            setFees('')
-            setValue('')
-            setGift([])
-            setCPF('')
-            setEmail('')
-            setNameClient('')
-            setDn('')
-            setPhone('')
-            setCep('')
-            setState('')
-            setCity('')
-            setNeighborhood('')
-            setStreet('')
-            setNumber('')
-            setComplement('')
-            setPersonName([])
-        } else if (productType === 'Accessories') {
-            setSeletedAccessories(undefined)
-            setPersonName([])
-            setQuantity('')
-            setFees('')
-            setValue('')
-        }
-    }
-
-    const IssueNote = () => {
-        axios
-            .post(`${import.meta.env.VITE_API_URI}/sendEmail`, {
-                email: email ? email : 'renatonunes0011@gmail.com',
-                cpf: cpf,
-                name: nameClient,
-                value: formattValue(value),
-                phone: phone,
-                cep: cep,
-                state: state,
-                city: city,
-                neighborhood: neighborhood,
-                street: street,
-                number: number,
-                complement: complement,
-                product: seletedDevice?.name,
-                formPayment: personName,
-            })
-            .catch((err) => console.log(err))
+        setSeletedProduct(undefined)
+        setValue('')
+        setCPF('')
+        setEmail('')
+        setNameClient('')
+        setDn('')
+        setPhone('')
+        setCep('')
+        setState('')
+        setCity('')
+        setNeighborhood('')
+        setStreet('')
+        setNumber('')
+        setComplement('')
+        setPersonName([])
+        setQuantity('')
     }
 
     const makeSale = () => {
-        if (productType === 'Device') {
-            soldProduct()
-            IssueNote()
-        } else if (productType === 'Accessories') {
-            soldProduct()
-        }
+        soldProduct()
     }
 
     return (
@@ -353,21 +229,13 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
-                            value={
-                                productType === 'Device' && seletedDevice
-                                    ? seletedDevice?.seriesNumber
-                                    : productType === 'Accessories' && seletedAccessories
-                                    ? seletedAccessories?.name
-                                    : ''
-                            }
+                            value={seletedProduct?.name}
                             label="Selecione o produto"
                             onChange={handleChange}
                         >
-                            {productType === 'Device'
-                                ? listDevice?.map((device: Device) => (
-                                      <MenuItem value={device.seriesNumber}>{`${device.name} - ${device.seriesNumber}`}</MenuItem>
-                                  ))
-                                : listAccessories?.map((accessories: string) => <MenuItem value={accessories}>{accessories}</MenuItem>)}
+                            {listProduct?.map((accessories: string) => (
+                                <MenuItem value={accessories}>{accessories}</MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Box>
@@ -393,70 +261,16 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                         </Select>
                     </FormControl>
                 </Box>
-
-                <TextField
-                    fullWidth
-                    type="text"
-                    id="outlined-basic"
-                    label="Valor da tarifa"
-                    variant="outlined"
-                    error={errorFees}
-                    helperText={errorFees ? 'Valor com no máximo 2 casas decimais!' : undefined}
-                    value={fees}
+                <InputMask
+                    mask="9999"
+                    maskPlaceholder={null}
+                    value={quantity}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        const regex = /^[0-9.,]*$/
-                        if (!regex.test(event.target.value)) {
-                            return ''
-                        }
-                        setFees(event.target.value)
+                        setQuantity(event.target.value)
                     }}
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">R$:</InputAdornment>,
-                    }}
-                    onBlur={() => {
-                        if (countDecimalPlaces(formattValue(fees)) > 2) {
-                            setErrorFees(true)
-                        } else {
-                            setErrorFees(false)
-                        }
-                    }}
-                />
-
-                {productType === 'Device' ? (
-                    <Box sx={{ minWidth: '200px', width: '100%' }}>
-                        <FormControl fullWidth>
-                            <InputLabel id="demo-multiple-checkbox-label">Brindes</InputLabel>
-                            <Select
-                                labelId="demo-multiple-checkbox-label"
-                                id="demo-multiple-checkbox"
-                                multiple
-                                value={gift}
-                                onChange={handleChangeGift}
-                                input={<OutlinedInput label="Brindes" />}
-                                renderValue={(selected) => selected.join(', ')}
-                                MenuProps={MenuProps}
-                            >
-                                {listAccessories?.map((listAccessories) => (
-                                    <MenuItem key={listAccessories} value={listAccessories}>
-                                        <Checkbox checked={gift.indexOf(listAccessories) > -1} />
-                                        <ListItemText primary={listAccessories} />
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                ) : (
-                    <InputMask
-                        mask="9999"
-                        maskPlaceholder={null}
-                        value={quantity}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            setQuantity(event.target.value)
-                        }}
-                    >
-                        <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
-                    </InputMask>
-                )}
+                >
+                    <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
+                </InputMask>
 
                 <TextField
                     fullWidth
@@ -479,14 +293,6 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                             setErrorValue(true)
                         } else {
                             setErrorValue(false)
-                            if (Number(Number(formattValue(value))) < minValue!) {
-                                setValue('')
-                                setOpen(true)
-                                setMessage(`Valor do produto é no mínimo R$${minValue} !`)
-                                setTimeout(() => {
-                                    setOpen(false)
-                                }, 2000)
-                            }
                         }
                     }}
                     InputProps={{
@@ -494,146 +300,146 @@ export default function SoldProduct({ productType }: InsertProductProps) {
                     }}
                 />
             </Grid>
-            {productType === 'Device' && (
-                <>
-                    <Grid container display={'flex'} gap={'20px'} style={{ marginTop: '20px', width: '100%' }}>
-                        <div className="title">
-                            <PeopleAltIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
-                            Detalhes do cliente
-                        </div>
-                    </Grid>
-                    <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
-                        <InputMask
-                            mask="999.999.999-99"
-                            maskPlaceholder={null}
-                            value={cpf}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setCPF(event.target.value)
-                            }}
-                        >
-                            <TextField fullWidth id="outlined-basic" label="CPF" variant="outlined" />
-                        </InputMask>
-                        <TextField
-                            required
-                            fullWidth
-                            id="outlined-basic"
-                            label="Email"
-                            variant="outlined"
-                            value={seletedClient?.email ? seletedClient.email : email}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setEmail(event.target.value)
-                            }}
-                        />
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Nome do cliente"
-                            variant="outlined"
-                            value={seletedClient?.name ? seletedClient.name : nameClient}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setNameClient(event.target.value)
-                            }}
-                        />
-                    </Grid>
-                    <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
-                        <InputMask mask="99/99/9999" maskPlaceholder={null} value={dn} onChange={(e) => setDn(e.target.value)}>
-                            <TextField fullWidth label="Data de nascimento" />
-                        </InputMask>
-                        <InputMask
-                            mask="(99)99999-9999"
-                            maskPlaceholder={null}
-                            value={seletedClient?.telephone ? seletedClient.telephone : phone}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setPhone(event.target.value)
-                            }}
-                        >
-                            <TextField fullWidth id="outlined-basic" label="Telefone" variant="outlined" />
-                        </InputMask>
-                        <InputMask
-                            mask="99.999-999"
-                            maskPlaceholder={null}
-                            value={cep}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setCep(event.target.value)
-                            }}
-                        >
-                            <TextField fullWidth id="outlined-basic" label="CEP" variant="outlined" />
-                        </InputMask>
-                    </Grid>
-                    <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Estado"
-                            variant="outlined"
-                            value={state}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setState(event.target.value)
-                            }}
-                        />
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Cidade"
-                            variant="outlined"
-                            value={city}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setCity(event.target.value)
-                            }}
-                        />
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Bairro"
-                            variant="outlined"
-                            value={neighborhood}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setNeighborhood(event.target.value)
-                            }}
-                        />
-                    </Grid>
-                    <Grid
-                        item
-                        display={'flex'}
-                        flexDirection={isMobile ? 'column' : 'row'}
-                        justifyContent={'start'}
-                        gap={'20px'}
-                        style={{ width: '100%' }}
-                    >
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Logradouro"
-                            variant="outlined"
-                            value={street}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setStreet(event.target.value)
-                            }}
-                        />
-                        <InputMask
-                            mask="99999"
-                            maskPlaceholder={null}
-                            value={number}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setNumber(event.target.value)
-                            }}
-                        >
-                            <TextField fullWidth label="Número" />
-                        </InputMask>
 
-                        <TextField
-                            fullWidth
-                            id="outlined-basic"
-                            label="Complemento"
-                            variant="outlined"
-                            value={complement}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setComplement(event.target.value)
-                            }}
-                        />
-                    </Grid>
-                </>
-            )}
+            <>
+                <Grid container display={'flex'} gap={'20px'} style={{ marginTop: '20px', width: '100%' }}>
+                    <div className="title">
+                        <PeopleAltIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
+                        Detalhes do cliente
+                    </div>
+                </Grid>
+                <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
+                    <InputMask
+                        mask="999.999.999-99"
+                        maskPlaceholder={null}
+                        value={cpf}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setCPF(event.target.value)
+                        }}
+                    >
+                        <TextField fullWidth id="outlined-basic" label="CPF" variant="outlined" />
+                    </InputMask>
+                    <TextField
+                        required
+                        fullWidth
+                        id="outlined-basic"
+                        label="Email"
+                        variant="outlined"
+                        value={selectedClient?.email ? selectedClient.email : email}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setEmail(event.target.value)
+                        }}
+                    />
+                    <TextField
+                        fullWidth
+                        id="outlined-basic"
+                        label="Nome do cliente"
+                        variant="outlined"
+                        value={selectedClient?.name ? selectedClient.name : nameClient}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setNameClient(event.target.value)
+                        }}
+                    />
+                </Grid>
+                <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
+                    <InputMask mask="99/99/9999" maskPlaceholder={null} value={dn} onChange={(e) => setDn(e.target.value)}>
+                        <TextField fullWidth label="Data de nascimento" />
+                    </InputMask>
+                    <InputMask
+                        mask="(99)99999-9999"
+                        maskPlaceholder={null}
+                        value={selectedClient?.telephone ? selectedClient.telephone : phone}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setPhone(event.target.value)
+                        }}
+                    >
+                        <TextField fullWidth id="outlined-basic" label="Telefone" variant="outlined" />
+                    </InputMask>
+                    <InputMask
+                        mask="99.999-999"
+                        maskPlaceholder={null}
+                        value={cep}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setCep(event.target.value)
+                        }}
+                    >
+                        <TextField fullWidth id="outlined-basic" label="CEP" variant="outlined" />
+                    </InputMask>
+                </Grid>
+                <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
+                    <TextField
+                        fullWidth
+                        id="outlined-basic"
+                        label="Estado"
+                        variant="outlined"
+                        value={state}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setState(event.target.value)
+                        }}
+                    />
+                    <TextField
+                        fullWidth
+                        id="outlined-basic"
+                        label="Cidade"
+                        variant="outlined"
+                        value={city}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setCity(event.target.value)
+                        }}
+                    />
+                    <TextField
+                        fullWidth
+                        id="outlined-basic"
+                        label="Bairro"
+                        variant="outlined"
+                        value={neighborhood}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setNeighborhood(event.target.value)
+                        }}
+                    />
+                </Grid>
+                <Grid
+                    item
+                    display={'flex'}
+                    flexDirection={isMobile ? 'column' : 'row'}
+                    justifyContent={'start'}
+                    gap={'20px'}
+                    style={{ width: '100%' }}
+                >
+                    <TextField
+                        fullWidth
+                        id="outlined-basic"
+                        label="Logradouro"
+                        variant="outlined"
+                        value={street}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setStreet(event.target.value)
+                        }}
+                    />
+                    <InputMask
+                        mask="99999"
+                        maskPlaceholder={null}
+                        value={number}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setNumber(event.target.value)
+                        }}
+                    >
+                        <TextField fullWidth label="Número" />
+                    </InputMask>
+
+                    <TextField
+                        fullWidth
+                        id="outlined-basic"
+                        label="Complemento"
+                        variant="outlined"
+                        value={complement}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            setComplement(event.target.value)
+                        }}
+                    />
+                </Grid>
+            </>
+
             <Snackbars message={message} type={checkMessage() ? 'success' : 'error'} open={open} />
             <Grid
                 item

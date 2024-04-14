@@ -23,7 +23,7 @@ import { useMedia } from '../../hooks/mediaQueryHook'
 import Loading from '../../components/Loading'
 
 interface Column {
-    id: 'name' | 'soldValue' | 'seriesNumber' | 'gift' | 'expenses' | 'fees' | 'formPayment' | 'client' | 'seller' | 'soldAt'
+    id: 'name' | 'soldValue' | 'formPayment' | 'client' | 'seller' | 'soldAt'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -38,34 +38,7 @@ const columns: readonly Column[] = [
         minWidth: 170,
         align: 'center',
     },
-    {
-        id: 'seriesNumber',
-        label: 'Numero de serie',
-        minWidth: 170,
-        align: 'center',
-        format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-        id: 'gift',
-        label: 'Brinde',
-        minWidth: 170,
-        align: 'center',
-        format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-        id: 'expenses',
-        label: 'Despesas',
-        minWidth: 170,
-        align: 'center',
-        format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
-        id: 'fees',
-        label: 'Tarifas',
-        minWidth: 170,
-        align: 'center',
-        format: (value: number) => value.toFixed(2),
-    },
+
     {
         id: 'formPayment',
         label: 'Forma de pagamento',
