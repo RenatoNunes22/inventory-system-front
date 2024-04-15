@@ -1,5 +1,5 @@
 import './style.css'
-import { Button, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup } from '@mui/material'
+import { Button, Grid } from '@mui/material'
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded'
 import TableViewIcon from '@mui/icons-material/TableView'
 import { useEffect, useState } from 'react'
@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom'
 
 export const Sold: React.FC = () => {
     const [controlButton, setControlButton] = useState<'sold' | 'history'>('sold')
-    const [productType, setProductType] = useState<string>('Device')
     const isMobile = useMedia('(max-width: 1250px)')
     const access = localStorage.getItem('role')
     const navigate = useNavigate()
@@ -25,9 +24,6 @@ export const Sold: React.FC = () => {
         }
     }, [])
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setProductType((event.target as HTMLInputElement).value)
-    }
     return (
         <Grid container={true} display={'flex'} direction={'row'} alignItems={'center'} justifyContent={'start'} xs={12} lg={12} xl={12}>
             <Grid
@@ -127,32 +123,6 @@ export const Sold: React.FC = () => {
                                 boxShadow: '5px 5px 30px 0px rgba(0, 0, 0, 0.30)',
                             }}
                         >
-                            {controlButton === 'sold' && (
-                                <FormControl
-                                    sx={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <FormLabel color="primary" id="demo-row-radio-buttons-group-label">
-                                        Selecione o tipo do produto
-                                    </FormLabel>
-                                    <RadioGroup
-                                        row
-                                        aria-labelledby="demo-row-radio-buttons-group-label"
-                                        name="row-radio-buttons-group"
-                                        value={productType}
-                                        onChange={handleChange}
-                                    >
-                                        <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                            <FormControlLabel value="Device" control={<Radio defaultChecked={true} />} label="Aparelhos" />
-                                            <FormControlLabel value="Accessories" control={<Radio />} label="Acessórios" />
-                                        </div>
-                                    </RadioGroup>
-                                </FormControl>
-                            )}
                             {controlButton === 'sold' ? (
                                 <div className="title">
                                     <ShoppingCartRoundedIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
@@ -165,7 +135,7 @@ export const Sold: React.FC = () => {
                                 </div>
                             )}
 
-                            {controlButton === 'sold' && <SoldProduct productType={productType} />}
+                            {controlButton === 'sold' && <SoldProduct />}
                             {controlButton === 'history' && <ViewStockSoldDevice />}
                         </div>
                     </div>

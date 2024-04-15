@@ -1,11 +1,9 @@
 import './style.css'
 import { Button, Grid } from '@mui/material'
-// import LightModeIcon from '@mui/icons-material/LightMode'
-// import DarkModeIcon from '@mui/icons-material/DarkMode'
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import Logo from '../../assets/image.png'
-import LogoWhite from '../../assets/image.png'
+import Logo from '../../assets/the_brothers.png'
+import LogoWhite from '../../assets/the_brothers.png'
 import { useNavigate } from 'react-router-dom'
 import { useMedia } from '../../hooks/mediaQueryHook'
 
@@ -30,17 +28,10 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
             ? setClick('Gerenciamento de estoque')
             : pathname === '/User'
             ? setClick('Usuarios')
-            : pathname === '/Admin'
-            ? setClick('Area admnistrativa')
+            : pathname === '/System'
+            ? setClick('Serviços')
             : setClick('')
     }, [pathname])
-
-    // const iconStyle = {
-    //     color: modeTheme ? '#000E23' : '#ffff',
-    //     cursor: 'pointer',
-    // }
-
-    const role = localStorage.getItem('role')
 
     if (pathname !== '/') {
         return (
@@ -61,9 +52,19 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                     marginBottom: '5%',
                 }}
             >
-                <img src={modeTheme ? Logo : LogoWhite} width={isMobile ? '150px' : '130px'} />
+                <img src={modeTheme ? Logo : LogoWhite} width={isMobile ? '100px' : '100px'} />
                 <div className="containerButtons" style={{ gap: isMobile ? '20px' : '40px', width: isMobile ? '100%' : '' }}>
                     <Button
+                        onClick={() => {
+                            setClick('Serviços')
+                            navigate('/System')
+                        }}
+                        sx={{ borderRadius: 0, color: '#FFF' }}
+                        className={`button ${click === 'Serviços' ? 'clicado' : ''}`}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Serviços</div>
+                    </Button>
+                    {/* <Button
                         onClick={() => {
                             setClick('Vendas')
                             navigate('/Sold')
@@ -71,65 +72,44 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                         sx={{ borderRadius: 0, color: '#FFF' }}
                         className={`button ${click === 'Vendas' ? 'clicado' : ''}`}
                     >
-                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Vendas</div>
+                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>VENDAS</div>
                     </Button>
-                    {role == '1' && (
-                        <>
-                            <Button
-                                onClick={() => {
-                                    setClick('Gerenciamento de estoque')
-                                    navigate('/Inventory')
-                                }}
-                                sx={{ borderRadius: 0, color: '#FFF' }}
-                                className={`button ${click === 'Gerenciamento de estoque' ? 'clicado' : ''}`}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Estoque</div>
-                            </Button>
-                            <Button
-                                onClick={() => {
-                                    setClick('Usuarios')
-                                    navigate('/User')
-                                }}
-                                sx={{ borderRadius: 0, color: '#FFF' }}
-                                className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Usuarios</div>
-                            </Button>
-                            <Button
-                                onClick={() => {
-                                    navigate('/')
-                                }}
-                                sx={{
-                                    borderRadius: 10,
-                                    color: '#FFF',
-                                    backgroundColor: '#0083c5',
-                                    cursor: 'pointer',
-                                    px: 4,
-                                    '&:hover': { backgroundColor: '#003e6d' },
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>SAIR</div>
-                            </Button>
-                        </>
-                    )}
-                    {/* <Button
+                    <Button
                         onClick={() => {
-                            setClick('Area admnistrativa')
-                            navigate('/Admin')
+                            setClick('Inventory')
+                            navigate('/Inventory')
                         }}
                         sx={{ borderRadius: 0, color: '#FFF' }}
-                        className={`button ${click === 'Area admnistrativa' ? 'clicado' : ''}`}
+                        className={`button ${click === 'ESTOQUE' ? 'clicado' : ''}`}
                     >
-                        <div style={{ display: 'flex', alignItems: 'center' }}>Área admnistrativa</div>
+                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>ESTOQUE</div>
                     </Button> */}
+                    <Button
+                        onClick={() => {
+                            setClick('Usuarios')
+                            navigate('/User')
+                        }}
+                        sx={{ borderRadius: 0, color: '#FFF' }}
+                        className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Usuarios</div>
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            navigate('/')
+                        }}
+                        sx={{
+                            borderRadius: 10,
+                            color: '#FFF',
+                            backgroundColor: '#c5a400',
+                            cursor: 'pointer',
+                            px: 4,
+                            '&:hover': { backgroundColor: '#003e6d' },
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>SAIR</div>
+                    </Button>
                 </div>
-                {/* <div style={{ display: "flex", gap: "40px" }}>
-          {modeTheme ? (
-            <LightModeIcon onClick={switchTheme} sx={iconStyle} />
-          ) : (
-            <DarkModeIcon onClick={switchTheme} sx={iconStyle} />
-          )}
-        </div> */}
                 {children}
             </Grid>
         )

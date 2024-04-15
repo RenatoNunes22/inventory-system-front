@@ -2,109 +2,59 @@ import * as React from 'react'
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import axios from 'axios'
-import { Device } from '../../model/Device'
 import { formatarData } from '../../utils/formatterData'
-import { Accessories } from '../../model/Accessories'
+import { Product } from '../../model/Product'
 import Snackbars from '../../components/SnackBar'
 import { useMedia } from '../../hooks/mediaQueryHook'
 
-type DeleteProductProps = {
-    productType: string
-}
-
-export default function DeleteProduct({ productType }: DeleteProductProps) {
+export default function DeleteProduct() {
     const isMobile = useMedia('(max-width: 850px)')
-    const [listDevice, setListDevice] = React.useState<Device[]>()
-    const [listAccessories, setListAccessories] = React.useState<Accessories[]>()
+    const [listProduct, setListProduct] = React.useState<Product[]>()
     const [search, setSearch] = React.useState<number | string>('')
-    const [device, setDevice] = React.useState<Device>()
-    const [accessories, setAccessories] = React.useState<Accessories>()
+    const [product, setProduct] = React.useState<Product>()
     const [newNameProduct, setNewNameProduct] = React.useState<string | undefined>()
     const [newValueProduct, setNewValueProduct] = React.useState<string | undefined>()
     const [newTypeProduct, setNewTypeProduct] = React.useState<string | undefined>()
-    const [newSeriesNumberProduct, setNewSeriesNumberProduct] = React.useState<string | undefined>()
     const [newStatusProduct, setNewStatusProduct] = React.useState<string | undefined>()
-    const [newStateBatteryProduct, setNewStateBatteryProduct] = React.useState<string | undefined>()
-    const [newMaxDiscountAmoutProduct, setNewMaxDiscountAmoutProduct] = React.useState<string | undefined>()
     const [newCreatedAtProduct, setNewCreatedAtProduct] = React.useState<string | undefined>()
     const [newQuantityProduct, setNewQuantityProduct] = React.useState<string | undefined>()
     const [message, setMessage] = React.useState<string>('')
     const [open, setOpen] = React.useState(false)
 
     React.useEffect(() => {
-        setDevice(undefined)
-        setAccessories(undefined)
+        setProduct(undefined)
     }, [search])
 
-    console.log(search)
-
     const searchProduct = () => {
-        if (productType === 'Device') {
-            axios
-                .get(`${import.meta.env.VITE_API_URI}/devices/${search}`)
-                .then((res) => setDataDevice(res.data[0]))
-                .catch((err) => console.log(err))
-        } else {
-            axios
-                .get(`${import.meta.env.VITE_API_URI}/accessories/${search}`)
-                .then((res) => (productType === 'Device' ? setDataDevice(res.data[0]) : setDataAccessories(res.data[0])))
-                .catch((err) => console.log(err))
-        }
+        axios
+            .get(`${import.meta.env.VITE_API_URI}/product/${search}`)
+            .then((res) => setDataProduct(res.data[0]))
+            .catch((err) => console.log(err))
     }
 
     const deleteProduct = () => {
-        if (productType === 'Device') {
-            axios
-                .delete(`${import.meta.env.VITE_API_URI}/devices/${search}`)
-                .then((res) => {
-                    setMessage(res.data)
-                    setOpen(true)
-                    setTimeout(() => {
-                        setDevice(undefined)
-                        setOpen(false)
-                        setNewNameProduct('')
-                        searchProduct()
-                    }, 2000)
-                })
-                .catch((err) => console.log(err))
-        } else {
-            axios
-                .delete(`${import.meta.env.VITE_API_URI}/accessories/${search}`)
-                .then((res) => {
-                    setMessage(res.data)
-                    setOpen(true)
-                    setTimeout(() => {
-                        setAccessories(undefined)
-                        setOpen(false)
-                        setNewNameProduct('')
-                        searchProduct()
-                    }, 2000)
-                })
-                .catch((err) => console.log(err))
-        }
+        axios
+            .delete(`${import.meta.env.VITE_API_URI}/product/${search}`)
+            .then((res) => {
+                setMessage(res.data)
+                setOpen(true)
+                setTimeout(() => {
+                    setProduct(undefined)
+                    setOpen(false)
+                    setNewNameProduct('')
+                    searchProduct()
+                }, 2000)
+            })
+            .catch((err) => console.log(err))
     }
 
-    const setDataDevice = (device: Device) => {
-        setDevice(device)
-        setNewNameProduct(device.name)
-        setNewValueProduct(String(device.inputValue))
-        setNewTypeProduct(device.type)
-        setNewStatusProduct(device.status)
-        setNewMaxDiscountAmoutProduct(String(device.maxDiscountAmout))
-        setNewCreatedAtProduct(formatarData(device.createdAt))
-        setNewSeriesNumberProduct(device.seriesNumber)
-        setNewStateBatteryProduct(String(device.stateBattery))
-    }
-
-    const setDataAccessories = (accessories: Accessories) => {
-        setAccessories(accessories)
-        setNewNameProduct(accessories.name)
-        setNewValueProduct(String(accessories.inputValue))
-        setNewTypeProduct(accessories.type)
-        setNewStatusProduct(accessories.status)
-        setNewMaxDiscountAmoutProduct(String(accessories.maxDiscountAmout))
-        setNewCreatedAtProduct(formatarData(accessories.createdAt))
-        setNewQuantityProduct(String(accessories.quantity))
+    const setDataProduct = (product: Product) => {
+        setProduct(product)
+        setNewNameProduct(product.name)
+        setNewValueProduct(String(product.inputValue))
+        setNewStatusProduct(product.status)
+        setNewCreatedAtProduct(formatarData(product.createdAt))
+        setNewQuantityProduct(String(product.quantity))
     }
 
     const handleChange = (event: SelectChangeEvent) => {
@@ -112,20 +62,11 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
     }
 
     React.useEffect(() => {
-        setDevice(undefined)
-        setAccessories(undefined)
-        if (productType === 'Device') {
-            axios.get(`${import.meta.env.VITE_API_URI}/devices/`).then((res) => {
-                setListDevice(res.data)
-                setNewNameProduct(res.data[0].name)
-            })
-        } else if (productType === 'Accessories') {
-            axios.get(`${import.meta.env.VITE_API_URI}/accessories/`).then((res) => {
-                setListAccessories(res.data)
-                setNewNameProduct(res.data[0].name)
-            })
-        }
-    }, [productType])
+        axios
+            .get(`${import.meta.env.VITE_API_URI}/product`)
+            .then((res) => setListProduct(res.data))
+            .catch((err) => console.log(err))
+    }, [])
 
     return (
         <Grid
@@ -169,13 +110,9 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                             label="Selecione o produto"
                             onChange={handleChange}
                         >
-                            {productType === 'Device'
-                                ? listDevice?.map((device: Device) => (
-                                      <MenuItem value={device.seriesNumber}>{`${device.name} - ${device.seriesNumber}`}</MenuItem>
-                                  ))
-                                : listAccessories?.map((accessories: Accessories) => (
-                                      <MenuItem value={accessories.name}>{accessories.name}</MenuItem>
-                                  ))}
+                            {listProduct?.map((product: Product) => (
+                                <MenuItem value={product.name}>{product.name}</MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                     <Button
@@ -191,7 +128,7 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                     </Button>
                 </Box>
             </Grid>
-            {(device || accessories) && (
+            {product && (
                 <Grid
                     item
                     display={'flex'}
@@ -260,54 +197,15 @@ export default function DeleteProduct({ productType }: DeleteProductProps) {
                         gap={2}
                         width={'100%'}
                     >
-                        {productType === 'Device' ? (
-                            <>
-                                <TextField
-                                    fullWidth
-                                    disabled
-                                    id="outlined-basic"
-                                    label="Numero de série"
-                                    variant="outlined"
-                                    value={newSeriesNumberProduct}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setNewSeriesNumberProduct(event.target.value)
-                                    }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    disabled
-                                    id="outlined-basic"
-                                    label="Estado da bateria"
-                                    variant="outlined"
-                                    value={newStateBatteryProduct}
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                        setNewStateBatteryProduct(event.target.value)
-                                    }}
-                                />{' '}
-                            </>
-                        ) : (
-                            <TextField
-                                fullWidth
-                                disabled
-                                id="outlined-basic"
-                                label="Quantidade de produto"
-                                variant="outlined"
-                                value={newQuantityProduct}
-                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                    setNewQuantityProduct(event.target.value)
-                                }}
-                            />
-                        )}
-
                         <TextField
                             fullWidth
                             disabled
                             id="outlined-basic"
-                            label="Desconto Máximo"
+                            label="Quantidade de produto"
                             variant="outlined"
-                            value={newMaxDiscountAmoutProduct}
+                            value={newQuantityProduct}
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setNewMaxDiscountAmoutProduct(event.target.value)
+                                setNewQuantityProduct(event.target.value)
                             }}
                         />
                     </Grid>

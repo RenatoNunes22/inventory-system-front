@@ -9,7 +9,6 @@ import TablePagination from '@mui/material/TablePagination'
 import TableRow from '@mui/material/TableRow'
 import axios from 'axios'
 import { formatarData } from '../../utils/formatterData'
-import { Accessories } from '../../model/Accessories'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { Box, Button, Grid, TextField } from '@mui/material'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
@@ -20,9 +19,10 @@ import SearchIcon from '@mui/icons-material/Search'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import { useMedia } from '../../hooks/mediaQueryHook'
 import Loading from '../../components/Loading'
+import { Product } from '../../model/Product'
 
 interface Column {
-    id: 'name' | 'inputValue' | 'type' | 'quantity' | 'maxDiscountAmout' | 'createdAt' | 'status'
+    id: 'name' | 'inputValue' | 'quantity' | 'status' | 'createdAt'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -33,29 +33,8 @@ const columns: readonly Column[] = [
     { id: 'name', label: 'Nome do aparelho', minWidth: 170, align: 'center' },
     { id: 'inputValue', label: 'Valor do aparelho', minWidth: 170, align: 'center' },
     {
-        id: 'type',
-        label: 'Tipo de aparelho',
-        minWidth: 170,
-        align: 'center',
-        format: (value: number) => value.toLocaleString('en-US'),
-    },
-    {
         id: 'quantity',
         label: 'Quantidade',
-        minWidth: 170,
-        align: 'center',
-        format: (value: number) => value.toFixed(2),
-    },
-    {
-        id: 'maxDiscountAmout',
-        label: 'Maximo desconto disponivel',
-        minWidth: 170,
-        align: 'center',
-        format: (value: number) => value.toFixed(2),
-    },
-    {
-        id: 'createdAt',
-        label: 'Data de inserção',
         minWidth: 170,
         align: 'center',
         format: (value: number) => value.toFixed(2),
@@ -67,31 +46,26 @@ const columns: readonly Column[] = [
         align: 'center',
         format: (value: number) => value.toFixed(2),
     },
+    {
+        id: 'createdAt',
+        label: 'Data de inserção',
+        minWidth: 170,
+        align: 'center',
+    },
 ]
 
-function createData(
-    name: string,
-    inputValue: number,
-    outputValue: number,
-    type: string,
-    quantity: number,
-    maxDiscountAmout: number,
-    createdAt: string,
-    status: string
-): Accessories {
+function createData(name: string, inputValue: number, outputValue: number, quantity: number, status: string, createdAt: string): Product {
     return {
         name,
         inputValue,
         outputValue,
-        type,
         quantity,
-        maxDiscountAmout,
-        createdAt,
         status,
+        createdAt,
     }
 }
 
-export default function ViewStockAccesories() {
+export default function ViewStockProduct() {
     const [search, setSearch] = React.useState('')
     const isMobile = useMedia('(max-width: 1150px)')
     const [finish, setFinish] = React.useState(true)
@@ -99,15 +73,13 @@ export default function ViewStockAccesories() {
     const [date, setDate] = React.useState<Dayjs | null>(null)
     const [page, setPage] = React.useState(0)
     const [rowsPerPage, setRowsPerPage] = React.useState(10)
-    const [rows, setRows] = React.useState<Array<Accessories>>([
+    const [rows, setRows] = React.useState<Array<Product>>([
         {
             name: '',
             inputValue: 0,
             outputValue: 0,
-            type: '',
             quantity: 0,
             status: '',
-            maxDiscountAmout: 0,
             createdAt: '',
         },
     ])
@@ -116,18 +88,16 @@ export default function ViewStockAccesories() {
         const fetchData = async () => {
             setFinish(false)
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URI}/accessories`)
+                const response = await axios.get(`${import.meta.env.VITE_API_URI}/product`)
 
-                const formattedRows = response.data.map((data: Accessories) => {
+                const formattedRows = response.data.map((data: Product) => {
                     return createData(
                         data.name,
                         data.inputValue,
                         data.outputValue,
-                        data.type,
                         data.quantity,
-                        data.maxDiscountAmout,
-                        formatarData(data.createdAt),
-                        data.status
+                        data.status,
+                        formatarData(data.createdAt)
                     )
                 })
 
@@ -155,25 +125,20 @@ export default function ViewStockAccesories() {
         setFinish(false)
         try {
             if (!search || !date) {
-                const response = await axios.get(`${import.meta.env.VITE_API_URI}/filterAccessories/data`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_URI}/filterProduct/data`, {
                     params: {
                         name: search ? search : undefined,
                         date: date ? date?.format('YYYY-MM-DD') : undefined,
                     },
                 })
-
-                console.log(response.data)
-
-                const formattedRows = response.data.map((data: Accessories) => {
+                const formattedRows = response.data.map((data: Product) => {
                     return createData(
                         data.name,
                         data.inputValue,
                         data.outputValue,
-                        data.type,
                         data.quantity,
-                        data.maxDiscountAmout,
-                        formatarData(data.createdAt),
-                        data.status
+                        data.status,
+                        formatarData(data.createdAt)
                     )
                 })
 
@@ -203,7 +168,7 @@ export default function ViewStockAccesories() {
                 <TextField
                     fullWidth
                     id="outlined-basic"
-                    label="Nome do acessório"
+                    label="Nome do produto"
                     variant="outlined"
                     value={search}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,7 +240,7 @@ export default function ViewStockAccesories() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: Accessories) => {
+                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: Product) => {
                                 return (
                                     <TableRow hover role="checkbox" tabIndex={-1}>
                                         {columns.map((column) => {

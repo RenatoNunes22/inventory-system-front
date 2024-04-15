@@ -1,10 +1,8 @@
-export interface Accessories {
+export interface Product {
     name: string
     inputValue: number
     outputValue: number
-    type: string
     quantity: number
     status: string
-    maxDiscountAmout: number
     createdAt: string
 }

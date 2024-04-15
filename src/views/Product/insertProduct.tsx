@@ -1,37 +1,24 @@
-import { Button, Grid, InputAdornment, TextField } from '@mui/material'
+import { Button, Grid, TextField } from '@mui/material'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import Snackbars from '../../components/SnackBar'
 import { useMedia } from '../../hooks/mediaQueryHook'
 import InputMask from 'react-input-mask'
 import Loading from '../../components/Loading'
-import { countDecimalPlaces } from '../../utils/countDecimalPlaces'
 import { formattValue } from '../../utils/formattValue'
 import { NumericFormat } from 'react-number-format'
-import './style.css'
 
-type InsertProductProps = {
-    productType: string
-}
-
-export default function InsertProduct({ productType }: InsertProductProps) {
+export default function InsertProduct() {
     const isMobile = useMedia('(max-width: 850px)')
     const [quantity, setQuantity] = useState<string>('')
     const [finish, setFinish] = useState(true)
     const [message, setMessage] = useState<string>('')
     const [open, setOpen] = useState(false)
-    const [nameDevice, setNameDevice] = useState('')
+    const [nameProduct, setNameProduct] = useState('')
     const [value, setValue] = useState('')
     const [outputValue, setOutputValue] = useState('')
-    const [type, setType] = useState('')
-    const [seriesNumber, setSeriesNumber] = useState<string>('')
     const [status, setStatus] = useState('')
-    const [stateBattery, setStateBattery] = useState<string>('')
-    const [color, setColor] = useState<string>('')
-    const [supplier, setSupplier] = useState<string>('')
-    const [maxDiscountAmout, setMaxDiscountAmout] = useState<string>('')
     const [check, setCheck] = useState<boolean>(false)
-    const [errorDiscount, setErrorDiscount] = useState<boolean>(false)
     const [focusIn, setFocusIn] = useState<boolean>(false)
     const [focusOut, setFocusOut] = useState<boolean>(false)
 
@@ -67,66 +54,27 @@ export default function InsertProduct({ productType }: InsertProductProps) {
     const insertProduct = () => {
         setFinish(false)
         if (check) {
-            if (productType === 'Device') {
-                axios
-                    .post(`${import.meta.env.VITE_API_URI}/device`, {
-                        name: nameDevice,
-                        inputValue: Number(formattValue(value)),
-                        outputValue: Number(formattValue(outputValue)),
-                        color: color,
-                        supplier: supplier,
-                        type: type,
-                        seriesNumber: seriesNumber,
-                        status: status,
-                        stateBattery: stateBattery,
-                        maxDiscountAmout: maxDiscountAmout ? Number(maxDiscountAmout.replace(/,/g, '.')) : 0,
-                    })
-                    .then((res) => {
-                        setMessage(res.data), setOpen(true)
-                        setNameDevice('')
-                        setValue('')
-                        setOutputValue('')
-                        setType('')
-                        setSeriesNumber('')
-                        setStatus('')
-                        setStateBattery('')
-                        setColor('')
-                        setSupplier('')
-                        setMaxDiscountAmout('')
-                    })
-                    .finally(() => {
-                        setFinish(true),
-                            setTimeout(() => {
-                                setOpen(false)
-                            }, 2000)
-                    })
-            } else if (productType === 'Accessories') {
-                axios
-                    .post(`${import.meta.env.VITE_API_URI}/accessories`, {
-                        name: nameDevice,
-                        inputValue: Number(value.replace('R$: ', '')),
-                        outputValue: Number(outputValue.replace('R$: ', '')),
-                        type: type,
-                        quantity: Number(quantity),
-                        status: status,
-                        maxDiscountAmout: maxDiscountAmout ? Number(maxDiscountAmout.replace('R$: ', '')) : 0,
-                    })
-                    .then((res) => {
-                        setMessage(res.data)
-                        setOpen(true)
-                        setNameDevice('')
-                        setValue('')
-                        setOutputValue('')
-                        setType('')
-                        setQuantity('')
-                        setStatus('')
-                        setMaxDiscountAmout('')
-                        setTimeout(() => {
-                            setOpen(false)
-                        }, 2000)
-                    })
-                    .finally(() => setFinish(true))
-            }
+            axios
+                .post(`${import.meta.env.VITE_API_URI}/accessories`, {
+                    name: nameProduct,
+                    inputValue: Number(value.replace('R$: ', '')),
+                    outputValue: Number(outputValue.replace('R$: ', '')),
+                    quantity: Number(quantity),
+                    status: status,
+                })
+                .then((res) => {
+                    setMessage(res.data)
+                    setOpen(true)
+                    setNameProduct('')
+                    setValue('')
+                    setOutputValue('')
+                    setQuantity('')
+                    setStatus('')
+                    setTimeout(() => {
+                        setOpen(false)
+                    }, 2000)
+                })
+                .finally(() => setFinish(true))
         }
     }
 
@@ -143,14 +91,12 @@ export default function InsertProduct({ productType }: InsertProductProps) {
     }
 
     useEffect(() => {
-        if (productType === 'Device' && nameDevice && value && seriesNumber) {
-            setCheck(true)
-        } else if (productType === 'Accessories' && nameDevice && value && quantity) {
+        if (nameProduct && value && quantity) {
             setCheck(true)
         } else {
             setCheck(false)
         }
-    }, [nameDevice, seriesNumber, value, quantity])
+    }, [nameProduct, value, quantity])
 
     return (
         <>
@@ -166,11 +112,11 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                 <TextField
                     fullWidth
                     id="outlined-basic"
-                    label={productType === 'Device' ? 'Nome do aparelho' : 'Nome do acessório'}
+                    label={'Nome do produto'}
                     variant="outlined"
-                    value={nameDevice}
+                    value={nameProduct}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setNameDevice(event.target.value.toUpperCase())
+                        setNameProduct(event.target.value.toUpperCase())
                     }}
                 />
                 <NumericFormat
@@ -206,116 +152,16 @@ export default function InsertProduct({ productType }: InsertProductProps) {
             </Grid>
 
             <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
-                {productType === 'Device' ? (
-                    <>
-                        <InputMask
-                            mask=""
-                            maskPlaceholder={null}
-                            value={seriesNumber}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setSeriesNumber(event.target.value.toUpperCase())
-                            }}
-                        >
-                            <TextField fullWidth id="outlined-basic" label="Número de série" variant="outlined" />
-                        </InputMask>
-                        <InputMask
-                            mask={'999'}
-                            maskPlaceholder={null}
-                            value={stateBattery}
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                setStateBattery(event.target.value.toUpperCase())
-                            }}
-                        >
-                            <TextField
-                                InputProps={{
-                                    endAdornment: <InputAdornment position="start">%</InputAdornment>,
-                                }}
-                                fullWidth
-                                id="outlined-basic"
-                                label="Saúde da bateria"
-                                variant="outlined"
-                            />
-                        </InputMask>
-                    </>
-                ) : (
-                    <InputMask
-                        mask={'99999'}
-                        maskPlaceholder={null}
-                        value={quantity}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            setQuantity(event.target.value.toUpperCase())
-                        }}
-                    >
-                        <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
-                    </InputMask>
-                )}
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label="Tipo do aparelho"
-                    variant="outlined"
-                    value={type}
+                <InputMask
+                    mask={'99999'}
+                    maskPlaceholder={null}
+                    value={quantity}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setType(event.target.value.toUpperCase())
+                        setQuantity(event.target.value.toUpperCase())
                     }}
-                />
-            </Grid>
-            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label={'Cor'}
-                    variant="outlined"
-                    value={color}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setColor(event.target.value.toUpperCase())
-                    }}
-                />
-                <TextField
-                    fullWidth
-                    id="outlined-basic"
-                    label={'Fornecedor'}
-                    variant="outlined"
-                    value={supplier}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setSupplier(event.target.value.toUpperCase())
-                    }}
-                />
-
-                <TextField
-                    fullWidth
-                    type="text"
-                    error={errorDiscount ? true : false}
-                    helperText={errorDiscount ? 'Valor com no máximo 2 casas decimais!' : undefined}
-                    id="outlined-basic"
-                    label="Desconto máximo"
-                    variant="outlined"
-                    value={maxDiscountAmout}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        const regex = /^[0-9.,]*$/
-                        if (!regex.test(event.target.value)) {
-                            return ''
-                        }
-                        setMaxDiscountAmout(event.target.value)
-                    }}
-                    onBlur={() => {
-                        if (countDecimalPlaces(formattValue(maxDiscountAmout)) > 2) {
-                            setErrorDiscount(true)
-                        } else {
-                            setErrorDiscount(false)
-                            if (Number(formattValue(outputValue)) < Number(formattValue(maxDiscountAmout))) {
-                                setMessage('Valor de saída deve ser maior que o valor de entrada!')
-                                setOpen(true)
-                                setMaxDiscountAmout('')
-                                setTimeout(() => {
-                                    setOpen(false)
-                                }, 2000)
-                            }
-                        }
-                    }}
-                />
-            </Grid>
-            <Grid item display={'flex'} flexDirection={isMobile ? 'column' : 'row'} gap={'20px'} style={{ width: '100%' }}>
+                >
+                    <TextField fullWidth id="outlined-basic" label="Quantidade" variant="outlined" />
+                </InputMask>
                 <TextField
                     fullWidth
                     id="outlined-basic"
@@ -327,6 +173,7 @@ export default function InsertProduct({ productType }: InsertProductProps) {
                     }}
                 />
             </Grid>
+
             <Snackbars message={message} type={message !== 'Produto inserido com sucesso!' ? 'error' : 'success'} open={open} />
             <Button
                 variant="contained"
