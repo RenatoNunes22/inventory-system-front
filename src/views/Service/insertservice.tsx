@@ -8,10 +8,12 @@ import {
     InputLabel,
     ListItemText,
     MenuItem,
+    Modal,
     OutlinedInput,
     Select,
     SelectChangeEvent,
     TextField,
+    Typography,
 } from '@mui/material'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
@@ -43,7 +45,7 @@ const MenuProps = {
 }
 
 interface Column {
-    id: 'client' | 'services' | 'barber' | 'value' | 'createdAt' | 'action'
+    id: '_id' | 'client' | 'services' | 'barber' | 'value' | 'createdAt' | 'action'
     label: string
     minWidth?: number
     align?: 'right' | 'left' | 'center'
@@ -51,6 +53,7 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
+    { id: '_id', label: 'id', minWidth: 0, align: 'center' },
     { id: 'client', label: 'Nome do cliente', minWidth: 170, align: 'center' },
     { id: 'services', label: 'Serviços', minWidth: 170, align: 'center', format: (value: number) => value.toLocaleString('en-US') },
     {
@@ -84,6 +87,7 @@ const columns: readonly Column[] = [
 ]
 
 interface Data {
+    _id: string
     client: string
     services: string
     barber: string
@@ -91,14 +95,27 @@ interface Data {
     createdAt: string
 }
 
-function createData(client: string, services: string, barber: string, value: string, createdAt: string): Data {
+function createData(_id: string, client: string, services: string, barber: string, value: string, createdAt: string): Data {
     return {
+        _id,
         client,
         services,
         barber,
         value,
         createdAt,
     }
+}
+
+const style = {
+    position: 'absolute' as const,
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '60%',
+    bgcolor: 'background.paper',
+    borderRadius: 2,
+    boxShadow: 24,
+    p: 4,
 }
 
 export default function InsertService() {
@@ -114,8 +131,18 @@ export default function InsertService() {
     const [att, setAtt] = useState<boolean>(false)
     const [page, setPage] = useState(0)
     const [rowsPerPage, setRowsPerPage] = useState(10)
+    const [openEdit, setOpenEdit] = useState(false)
+    const [rowSelected, setRowSelected] = useState<Data>()
+
+    //EditService
+    const [clientNameEdit, setClientNameEdit] = useState('')
+    const [valueEdit, setValueEdit] = useState('')
+    const [barberEdit, setBarberEdit] = useState('')
+    const [servicesEdit, setServiceEdit] = useState<string[]>([])
+
     const [rows, setRows] = useState<Array<Data>>([
         {
+            _id: '',
             client: '',
             services: '',
             barber: '',
@@ -141,7 +168,10 @@ export default function InsertService() {
         setPage(newPage)
     }
 
-    console.log(rows)
+    const handleOpenEdit = (row: Data) => {
+        setOpenEdit(true), setRowSelected(row)
+    }
+    const handleCloseEdit = () => setOpenEdit(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -149,7 +179,14 @@ export default function InsertService() {
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_URI}/services`)
                 const formattedRows = response.data.map((data: any) => {
-                    return createData(data.client, data.services.join(', '), data.barber, data.value, formatarData(data.createdAt))
+                    return createData(
+                        data._id,
+                        data.client,
+                        data.services.join(', '),
+                        data.barber,
+                        data.value,
+                        formatarData(data.createdAt)
+                    )
                 })
 
                 setRows(formattedRows)
@@ -194,6 +231,17 @@ export default function InsertService() {
         }
     }
 
+    const DeleteService = (_id: string) => {
+        axios.delete(`${import.meta.env.VITE_API_URI}/services/${_id}`).then((res) => {
+            setMessage(res.data)
+            setOpen(true)
+            setTimeout(() => {
+                setOpen(false)
+                setAtt(!att)
+            }, 2000)
+        })
+    }
+
     useEffect(() => {
         if (clientName && barber && services.length > 0 && value) {
             setCheck(true)
@@ -207,6 +255,119 @@ export default function InsertService() {
             target: { value },
         } = event
         setServices(typeof value === 'string' ? value.split(',') : value)
+    }
+
+    const handleChangeServiceEdit = (event: SelectChangeEvent<typeof services>) => {
+        const {
+            target: { value },
+        } = event
+        setServiceEdit(typeof value === 'string' ? value.split(',') : value)
+    }
+
+    const checkMessage = (message: string) => {
+        switch (message) {
+            case 'Serviço inserido com sucesso!':
+                return 'success'
+            case 'Serviço deletado com sucesso!':
+                return 'success'
+            case 'Serviço atualizado com sucesso!':
+                return 'success'
+            default:
+                return 'error'
+        }
+    }
+
+    const EditService = () => {
+        setFinish(false)
+        axios
+            .put(`${import.meta.env.VITE_API_URI}/services/${rowSelected?._id}`, {
+                client: clientNameEdit ? clientNameEdit : rowSelected?.client,
+                value: Number(valueEdit) ? Number(valueEdit) : rowSelected?.value,
+                barber: barberEdit ? barberEdit : rowSelected?.barber,
+                services: servicesEdit ? servicesEdit : rowSelected?.services.split(', '),
+            })
+            .then((res) => {
+                setMessage(res.data)
+                setOpen(true)
+                setClientName('')
+                setValue('')
+                setBarber('')
+                setServices([])
+                setTimeout(() => {
+                    setOpen(false)
+                    setAtt(!att)
+                    handleCloseEdit()
+                }, 2000)
+            })
+            .finally(() => setFinish(true))
+    }
+
+    const EditModal = () => {
+        const serviceSelected = rowSelected?.services.split(', ')
+        return (
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={isMobile ? 'column' : 'row'}
+                gap="20px"
+                paddingTop={'20px'}
+                style={{ width: '100%' }}
+            >
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label={'Nome do cliente'}
+                    variant="outlined"
+                    value={clientNameEdit ? clientNameEdit : rowSelected?.client}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setClientNameEdit(event.target.value.toUpperCase())
+                    }}
+                />
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label={'Nome do barbeiro'}
+                    variant="outlined"
+                    value={barberEdit ? barberEdit : rowSelected?.barber}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setBarberEdit(event.target.value.toUpperCase())
+                    }}
+                />
+                <Box sx={{ minWidth: '200px', width: '100%' }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-multiple-checkbox-label">Serviço contratado</InputLabel>
+                        <Select
+                            labelId="demo-multiple-checkbox-label"
+                            id="demo-multiple-checkbox"
+                            multiple
+                            value={servicesEdit.length > 0 ? servicesEdit : serviceSelected}
+                            onChange={handleChangeServiceEdit}
+                            input={<OutlinedInput label="Serviços contratados" />}
+                            renderValue={(selected) => selected.join(', ')}
+                            MenuProps={MenuProps}
+                        >
+                            {service.map((name) => (
+                                <MenuItem key={name} value={name}>
+                                    <Checkbox checked={servicesEdit.indexOf(name) > -1} />
+                                    <ListItemText primary={name} />
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Box>
+                <TextField
+                    fullWidth
+                    id="outlined-basic"
+                    label={'Valor do serviço'}
+                    type="number"
+                    variant="outlined"
+                    value={valueEdit ? valueEdit : rowSelected?.value}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        setValueEdit(event.target.value)
+                    }}
+                />
+            </Grid>
+        )
     }
 
     return (
@@ -307,7 +468,7 @@ export default function InsertService() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, idx) => {
+                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row: Data, idx) => {
                                 return (
                                     <TableRow hover role="checkbox" tabIndex={-1} key={idx}>
                                         {columns.map((column) => {
@@ -316,8 +477,11 @@ export default function InsertService() {
                                                 <TableCell sx={{ fontSize: 16 }} key={column.id} align={column.align}>
                                                     {column.id === 'action' ? (
                                                         <>
-                                                            <EditIcon onClick={() => null} style={{ cursor: 'pointer' }} />
-                                                            <DeleteOutlineOutlinedIcon onClick={() => null} style={{ cursor: 'pointer' }} />
+                                                            <EditIcon onClick={() => handleOpenEdit(row)} style={{ cursor: 'pointer' }} />
+                                                            <DeleteOutlineOutlinedIcon
+                                                                onClick={() => DeleteService(row._id)}
+                                                                style={{ cursor: 'pointer' }}
+                                                            />
                                                         </>
                                                     ) : column.format && typeof value === 'number' ? (
                                                         column.format(value)
@@ -343,7 +507,34 @@ export default function InsertService() {
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
-            <Snackbars message={message} type={message !== 'Serviços inserido com sucesso!' ? 'error' : 'success'} open={open} />
+            <div>
+                <Modal
+                    open={openEdit}
+                    onClose={handleCloseEdit}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={style}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: '20px' }}>
+                            Atualizar serviço
+                        </Typography>
+                        {EditModal()}
+                        <Button
+                            variant="contained"
+                            sx={{
+                                width: '100%',
+                                marginTop: '20px',
+                                backgroundColor: '#c5a400',
+                                color: '#FFFF',
+                            }}
+                            onClick={EditService}
+                        >
+                            Editar Serviço
+                        </Button>
+                    </Box>
+                </Modal>
+            </div>
+            <Snackbars message={message} type={checkMessage(message)} open={open} />
         </>
     )
 }
