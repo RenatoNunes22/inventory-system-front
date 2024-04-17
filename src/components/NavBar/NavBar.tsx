@@ -21,6 +21,8 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
     const path = useLocation()
     const { pathname } = path
 
+    const role = Number(localStorage.getItem('role'))
+
     useEffect(() => {
         pathname === '/Sold'
             ? setClick('Vendas')
@@ -84,16 +86,19 @@ export const NavBar = ({ color, children, modeTheme }: navBarProps) => {
                     >
                         <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>ESTOQUE</div>
                     </Button> */}
-                    <Button
-                        onClick={() => {
-                            setClick('Usuarios')
-                            navigate('/User')
-                        }}
-                        sx={{ borderRadius: 0, color: '#FFF' }}
-                        className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Usuarios</div>
-                    </Button>
+                    {role < 2 && (
+                        <Button
+                            onClick={() => {
+                                setClick('Usuarios')
+                                navigate('/User')
+                            }}
+                            sx={{ borderRadius: 0, color: '#FFF' }}
+                            className={`button ${click === 'Usuarios' ? 'clicado' : ''}`}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', fontSize: '16px' }}>Usuarios</div>
+                        </Button>
+                    )}
+
                     <Button
                         onClick={() => {
                             navigate('/')

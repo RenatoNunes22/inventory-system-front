@@ -32,6 +32,15 @@ import Loading from '../../components/Loading'
 import { formatarData } from '@/utils/formatterData'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import dayjs, { Dayjs } from 'dayjs'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
+import BackspaceIcon from '@mui/icons-material/Backspace'
+import TableRowsIcon from '@mui/icons-material/TableRows'
 
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
@@ -133,12 +142,18 @@ export default function InsertService() {
     const [rowsPerPage, setRowsPerPage] = useState(10)
     const [openEdit, setOpenEdit] = useState(false)
     const [rowSelected, setRowSelected] = useState<Data>()
+    const [isFilter, setIsFilter] = useState<boolean>(false)
 
     //EditService
     const [clientNameEdit, setClientNameEdit] = useState('')
     const [valueEdit, setValueEdit] = useState('')
     const [barberEdit, setBarberEdit] = useState('')
     const [servicesEdit, setServiceEdit] = useState<string[]>([])
+
+    //Filter
+    const [clientNameFilter, setClientNameFilter] = useState('')
+    const [barberFilter, setBarberFilter] = useState('')
+    const [date, setDate] = useState<Dayjs | null>(dayjs())
 
     const [rows, setRows] = useState<Array<Data>>([
         {
@@ -164,7 +179,7 @@ export default function InsertService() {
         'Hidratação',
     ]
 
-    const handleChangePage = (newPage: number) => {
+    const handleChangePage = (_: unknown, newPage: number) => {
         setPage(newPage)
     }
 
@@ -227,19 +242,29 @@ export default function InsertService() {
                         setAtt(!att)
                     }, 2000)
                 })
+                .catch((error) => {
+                    setFinish(true)
+                    console.error('Error fetching data:', error)
+                })
                 .finally(() => setFinish(true))
         }
     }
 
     const DeleteService = (_id: string) => {
-        axios.delete(`${import.meta.env.VITE_API_URI}/services/${_id}`).then((res) => {
-            setMessage(res.data)
-            setOpen(true)
-            setTimeout(() => {
-                setOpen(false)
-                setAtt(!att)
-            }, 2000)
-        })
+        axios
+            .delete(`${import.meta.env.VITE_API_URI}/services/${_id}`)
+            .then((res) => {
+                setMessage(res.data)
+                setOpen(true)
+                setTimeout(() => {
+                    setOpen(false)
+                    setAtt(!att)
+                }, 2000)
+            })
+            .catch((error) => {
+                setFinish(true)
+                console.error('Error fetching data:', error)
+            })
     }
 
     useEffect(() => {
@@ -299,7 +324,48 @@ export default function InsertService() {
                     handleCloseEdit()
                 }, 2000)
             })
+            .catch((error) => {
+                setFinish(true)
+                console.error('Error fetching data:', error)
+            })
             .finally(() => setFinish(true))
+    }
+
+    const filterService = async () => {
+        setFinish(false)
+        await axios
+            .get(`${import.meta.env.VITE_API_URI}/filterServices/data`, {
+                params: {
+                    client: clientNameFilter ? clientNameFilter : undefined,
+                    barber: barberFilter ? barberFilter : undefined,
+                    date: date ? date?.format('YYYY-MM-DD') : undefined,
+                },
+            })
+            .then((res) => {
+                const formattedRows = res.data.map((data: any) => {
+                    return createData(
+                        data._id,
+                        data.client,
+                        data.services.join(', '),
+                        data.barber,
+                        data.value,
+                        formatarData(data.createdAt)
+                    )
+                })
+                setRows(formattedRows)
+            })
+            .catch((error) => {
+                setFinish(true)
+                console.error('Error fetching data:', error)
+            })
+            .finally(() => setFinish(true))
+    }
+
+    const clearFilter = () => {
+        setClientNameFilter('')
+        setBarberFilter('')
+        setDate(null)
+        setAtt(!att)
     }
 
     const EditModal = () => {
@@ -379,6 +445,7 @@ export default function InsertService() {
                 flexDirection={isMobile ? 'column' : 'row'}
                 gap="20px"
                 paddingTop={'20px'}
+                marginBottom={'20px'}
                 style={{ width: '100%' }}
             >
                 <TextField
@@ -436,7 +503,8 @@ export default function InsertService() {
                 <Button
                     variant="contained"
                     sx={{
-                        width: '70%',
+                        height: '56px',
+                        width: isMobile ? '100%' : '70%',
                         backgroundColor: '#c5a400',
                         color: '#FFFF',
                     }}
@@ -445,6 +513,105 @@ export default function InsertService() {
                 >
                     Adicionar serviço
                 </Button>
+            </Grid>
+
+            <div className="title">
+                <TableRowsIcon sx={{ color: '#03082e', width: '30px', height: '30px' }} />
+                Serviços cadastrados
+            </div>
+            <Grid
+                item
+                display={'flex'}
+                flexDirection={'column'}
+                gap="20px"
+                justifyContent={'start'}
+                alignItems={'start'}
+                paddingTop={'10px'}
+                style={{ width: '100%' }}
+            >
+                <Button
+                    variant="contained"
+                    sx={{
+                        width: isMobile ? '100%' : '15%',
+                        backgroundColor: isFilter ? '#c0bebe' : '#85170c',
+                        color: '#FFFF',
+                        '&:hover': {
+                            backgroundColor: '#a01b0e',
+                        },
+                    }}
+                    onClick={() => setIsFilter(!isFilter)}
+                >
+                    Filtrar {isFilter ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                </Button>
+                {isFilter && (
+                    <Grid
+                        item
+                        display={'flex'}
+                        flexDirection={isMobile ? 'column' : 'row'}
+                        gap="20px"
+                        justifyContent={'start'}
+                        alignItems={'end'}
+                        style={{ width: '100%' }}
+                    >
+                        <TextField
+                            sx={{ width: isMobile ? '100%' : '20%' }}
+                            id="outlined-basic"
+                            label={'Filtrar por cliente'}
+                            variant="outlined"
+                            value={clientNameFilter}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setClientNameFilter(event.target.value.toUpperCase())
+                            }}
+                        />
+                        <TextField
+                            sx={{ width: isMobile ? '100%' : '20%' }}
+                            id="outlined-basic"
+                            label={'Filtrar por barbeiro'}
+                            variant="outlined"
+                            value={barberFilter}
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                setBarberFilter(event.target.value.toUpperCase())
+                            }}
+                        />
+                        <Box sx={{ width: isMobile ? '100%' : null }}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DemoContainer components={['DatePicker']}>
+                                    <DatePicker disableFuture={true} format="DD/MM/YYYY" onChange={setDate} label="Seleciona o dia" />
+                                </DemoContainer>
+                            </LocalizationProvider>
+                        </Box>
+                        <Button
+                            variant="contained"
+                            sx={{
+                                height: '56px',
+                                width: isMobile ? '100%' : '15%',
+                                backgroundColor: '#85170c',
+                                color: '#FFFF',
+                                '&:hover': {
+                                    backgroundColor: '#a01b0e',
+                                },
+                            }}
+                            onClick={filterService}
+                        >
+                            <ManageSearchIcon sx={{ marginRight: '10px' }} /> Buscar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            sx={{
+                                height: '56px',
+                                width: isMobile ? '100%' : '15%',
+                                backgroundColor: '#85170c',
+                                color: '#FFFF',
+                                '&:hover': {
+                                    backgroundColor: '#a01b0e',
+                                },
+                            }}
+                            onClick={clearFilter}
+                        >
+                            <BackspaceIcon sx={{ marginRight: '10px' }} /> Limpar filtro
+                        </Button>
+                    </Grid>
+                )}
             </Grid>
             <Paper sx={{ width: '100%', overflow: 'hidden' }}>
                 <TableContainer sx={{ maxHeight: 440 }}>
@@ -498,12 +665,12 @@ export default function InsertService() {
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
+                    rowsPerPageOptions={[10, 50, 100]}
                     component="div"
                     count={rows.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
-                    onPageChange={() => handleChangePage}
+                    onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
