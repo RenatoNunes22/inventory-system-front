@@ -37,7 +37,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import dayjs, { Dayjs } from 'dayjs'
+import { Dayjs } from 'dayjs'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import BackspaceIcon from '@mui/icons-material/Backspace'
 import TableRowsIcon from '@mui/icons-material/TableRows'
@@ -153,7 +153,7 @@ export default function InsertService() {
     //Filter
     const [clientNameFilter, setClientNameFilter] = useState('')
     const [barberFilter, setBarberFilter] = useState('')
-    const [date, setDate] = useState<Dayjs | null>(dayjs())
+    const [date, setDate] = useState<Dayjs | null>(null)
 
     const [rows, setRows] = useState<Array<Data>>([
         {
@@ -333,6 +333,7 @@ export default function InsertService() {
 
     const filterService = async () => {
         setFinish(false)
+        console.log(date)
         await axios
             .get(`${import.meta.env.VITE_API_URI}/filterServices/data`, {
                 params: {
@@ -539,7 +540,12 @@ export default function InsertService() {
                             backgroundColor: '#a01b0e',
                         },
                     }}
-                    onClick={() => setIsFilter(!isFilter)}
+                    onClick={() => {
+                        setIsFilter(!isFilter)
+                        if (isFilter) {
+                            clearFilter()
+                        }
+                    }}
                 >
                     Filtrar {isFilter ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                 </Button>
